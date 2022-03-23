@@ -1,1 +1,3 @@
-# gamma_fe
+npm install
+
+npm start

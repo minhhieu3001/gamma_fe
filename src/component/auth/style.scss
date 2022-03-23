@@ -1,0 +1,33 @@
+.container {
+  background-color: black;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+
+  .background {
+    position: absolute;
+    transform: translate(30%, 50%);
+    background-image: url('https://gama-platform.org/img/GAMA_1.8_IS_OUT.mov.gif');
+    background-repeat: no-repeat;
+    width: 50%;
+    height: 50%;
+  }
+
+  .form-container {
+    width: 21rem;
+    background: white;
+    z-index: 1;
+    top: 50%;
+    right: 6%;
+    position: absolute;
+    transform: translate(-12%, -50%);
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+  }
+  .img-contain {
+    display: flex;
+    justify-content: center;
+    padding-top: 15px;
+  }
+}
