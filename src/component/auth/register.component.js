@@ -9,12 +9,17 @@ import {
 } from '@ant-design/icons';
 import addNotification, { NOTIFICATION_TYPE } from '../notification';
 import { useHistory } from 'react-router-dom';
+import { regist } from '../../service/api';
 
 export const Register = () => {
   const history = useHistory();
   const onFinish = (values) => {
-    addNotification('Tạo tài khoản thành công', NOTIFICATION_TYPE.SUCCESS);
-    history.push('/');
+    regist(values)
+      .then((res) => {
+        addNotification('Tạo tài khoản thành công', NOTIFICATION_TYPE.SUCCESS);
+        history.push('/');
+      })
+      .catch((err) => addNotification(err.message, NOTIFICATION_TYPE.ERROR));
   };
   return (
     <>
@@ -42,7 +47,7 @@ export const Register = () => {
             <Divider style={{ marginBottom: 30 }} />
             <Space direction="vertical">
               <Form.Item
-                name="username"
+                name="name"
                 wrapperCol={{ span: 24 }}
                 rules={[
                   { required: true, message: 'Please input your username!' },
@@ -51,6 +56,23 @@ export const Register = () => {
                 <Input
                   prefix={<UserOutlined className="site-form-item-icon" />}
                   placeholder="Enter username..."
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="email"
+                wrapperCol={{ span: 24 }}
+                rules={[
+                  { required: true, message: 'Please input your email!' },
+                  {
+                    pattern: /\S+@\S+\.\S+/,
+                    message: 'Not email format!',
+                  },
+                ]}
+              >
+                <Input
+                  prefix={<UserOutlined className="site-form-item-icon" />}
+                  placeholder="Enter email..."
                 />
               </Form.Item>
 
@@ -71,10 +93,10 @@ export const Register = () => {
               </Form.Item>
 
               <Form.Item
-                name="confirmPassword"
+                name="password_confirmation"
                 wrapperCol={{ span: 24 }}
                 rules={[
-                  { required: true, message: 'Please input your password!' },
+                  { required: true, message: 'Please input confirm password!' },
                 ]}
               >
                 <Input.Password
