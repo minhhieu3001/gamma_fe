@@ -78,8 +78,16 @@ export const ParameterModal = (props) => {
           className="param-section"
           style={{ height: '20vh', overflowY: 'auto' }}
         >
-          <Form.List name="parameterList">
-            {(fields, { add, remove }) => (
+          <Form.List
+            name="parameterList"
+            rules={[
+              {
+                required: true,
+                message: 'Missing parameters',
+              },
+            ]}
+          >
+            {(fields, { add, remove }, { errors }) => (
               <>
                 {fields.map(({ key, name, ...restField }, index) => (
                   <Space key={key} style={{ display: 'flex' }} align="baseline">
@@ -129,6 +137,7 @@ export const ParameterModal = (props) => {
                     <MinusCircleOutlined onClick={() => remove(name)} />
                   </Space>
                 ))}
+                <Form.ErrorList errors={errors} />
                 <Form.Item>
                   <Button
                     type="dashed"
@@ -148,47 +157,62 @@ export const ParameterModal = (props) => {
           className="output-section"
           style={{ height: '20vh', overflowY: 'auto' }}
         >
-          <Form.List name="outputList">
-            {(fields, { add, remove }) => (
+          <Form.List
+            name="outputList"
+            rules={[
+              {
+                required: true,
+                message: 'Missing outputs',
+              },
+            ]}
+          >
+            {(fields, { add, remove }, { errors }) => (
               <>
                 {fields.map(({ key, name, ...restField }, index) => (
-                  <Space key={key} style={{ display: 'flex' }} align="baseline">
-                    <Form.Item
-                      {...restField}
-                      name={[name, 'name']}
-                      rules={[
-                        { required: true, message: 'Missing output name' },
-                      ]}
-                      style={{ width: '120px' }}
+                  <>
+                    <Space
+                      key={key}
+                      style={{ display: 'flex' }}
+                      align="baseline"
                     >
-                      <Input placeholder="Name" style={{ width: '120px' }} />
-                    </Form.Item>
-                    <Form.Item
-                      {...restField}
-                      name={[name, 'framerate']}
-                      type="number"
-                      rules={[
-                        {
-                          required: true,
-                          message: 'Missing parameter framerate',
-                        },
-                        {
-                          pattern: /^(?:\d*)$/,
-                          message: 'Must be greater than -1',
-                        },
-                      ]}
-                      style={{ width: '120px' }}
-                    >
-                      <Input
-                        placeholder="Frame rate"
-                        type="number"
-                        min={0}
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'name']}
+                        rules={[
+                          { required: true, message: 'Missing output name' },
+                        ]}
                         style={{ width: '120px' }}
-                      />
-                    </Form.Item>
-                    <MinusCircleOutlined onClick={() => remove(name)} />
-                  </Space>
+                      >
+                        <Input placeholder="Name" style={{ width: '120px' }} />
+                      </Form.Item>
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'framerate']}
+                        type="number"
+                        rules={[
+                          {
+                            required: true,
+                            message: 'Missing parameter framerate',
+                          },
+                          {
+                            pattern: /^(?:\d*)$/,
+                            message: 'Must be greater than -1',
+                          },
+                        ]}
+                        style={{ width: '120px' }}
+                      >
+                        <Input
+                          placeholder="Frame rate"
+                          type="number"
+                          min={0}
+                          style={{ width: '120px' }}
+                        />
+                      </Form.Item>
+                      <MinusCircleOutlined onClick={() => remove(name)} />
+                    </Space>
+                  </>
                 ))}
+                <Form.ErrorList errors={errors} />
                 <Form.Item>
                   <Button
                     type="dashed"

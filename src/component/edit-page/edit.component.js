@@ -36,6 +36,10 @@ import { XMLGenerator } from '../common/XML-generator';
 import { ParameterModal } from './modal/parameterModal.component';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { HeaderComp } from '../common/header.component';
+import { getItem } from '../../utils';
+import { createPj } from '../../service/api';
+import addNotification, { NOTIFICATION_TYPE } from '../notification';
+import { connect } from 'react-redux';
 
 const { TabPane } = Tabs;
 const { SubMenu } = Menu;
@@ -71,7 +75,8 @@ const columns = [
   },
 ];
 
-export const Edit = () => {
+const Edit = (props) => {
+  const { setInputXMl } = props;
   const edtiableColumns = columns.map((col) => {
     if (!col.editable) {
       return col;
@@ -169,18 +174,25 @@ export const Edit = () => {
   };
 
   const handleCreateProject = (name) => {
-    const newProject = {
-      id: uniqueId(),
-      name,
-      includes: [],
-      models: [],
-    };
-    setProjectTree((data) => [...data, newProject]);
-    handleCloseModal();
+    // const newProject = {
+    //   id: uniqueId(),
+    //   name,
+    //   includes: [],
+    //   models: [],
+    // };
+    // setProjectTree((data) => [...data, newProject]);
+    const user = getItem('user');
+    createPj({ user_id: user.id, name })
+      .then((res) => {
+        handleCloseModal();
+        addNotification('Create project successful', NOTIFICATION_TYPE.SUCCESS);
+      })
+      .catch((err) =>
+        addNotification(err?.response?.data?.message, NOTIFICATION_TYPE.ERROR),
+      );
   };
 
   const handleDeleteProject = (id) => {
-    console.log(id);
     setProjectTree((data) => data.filter((item) => item.id !== id));
     handleCloseModal();
   };
@@ -202,6 +214,7 @@ export const Edit = () => {
       id: index,
     }));
     const xml = XMLGenerator(model, data.parameterList, outputList);
+    setInputXMl({ model, parameterList: data.parameterList || [], outputList });
     const id = modal.id;
     handleCloseModal();
     history.push('/simulation/' + id);
@@ -456,3 +469,12 @@ export const Edit = () => {
     </>
   );
 };
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setInputXMl: (value) => dispatch({ type: 'CREATE_INPUT_XML', value }),
+  };
+};
+const mapStateToProps = () => {};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Edit);

@@ -1,0 +1,49 @@
+.site-layout-background {
+  height: 100vh;
+}
+
+.ant-tabs-nav {
+  margin: 0 !important;
+}
+
+.ͼ2 .cm-gutters {
+  background-color: #fff !important;
+  border-color: #fff !important;
+  user-select: none;
+}
+
+.ant-layout-sider {
+  height: 90vh;
+}
+
+.main-content_1 {
+  width: 100vw;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+
+  img {
+    max-height: 60vh;
+    object-fit: contain;
+  }
+}
+
+.media_comp {
+  position: absolute;
+  top: 60px;
+  left: 50px;
+  height: 40px;
+  width: 160px;
+  background-color: #d9d9d9;
+  border-radius: 20px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+
+  .step_text {
+    margin-right: 20px;
+  }
+}

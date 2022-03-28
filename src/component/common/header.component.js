@@ -5,8 +5,14 @@ import {
 } from '@ant-design/icons';
 import { Avatar, Col, Dropdown, Menu } from 'antd';
 import { Header } from 'antd/lib/layout/layout';
+import { useHistory } from 'react-router-dom';
 
 export const HeaderComp = (props) => {
+  const history = useHistory();
+  const logout = () => {
+    localStorage.clear();
+    history.push('/');
+  };
   const menu = (
     <Menu>
       <Menu.Item key="0" icon={<UserOutlined />}>
@@ -19,7 +25,7 @@ export const HeaderComp = (props) => {
         </a>
       </Menu.Item>
       <Menu.Divider />
-      <Menu.Item key="3" icon={<LogoutOutlined />}>
+      <Menu.Item key="3" icon={<LogoutOutlined />} onClick={logout}>
         Log out
       </Menu.Item>
     </Menu>

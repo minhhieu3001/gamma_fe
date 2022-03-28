@@ -1,12 +1,14 @@
 import { Form, Select, Modal, Upload, Button } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
 import { UploadOutlined } from '@ant-design/icons';
+import { useState } from 'react';
 
 const { Option } = Select;
 
 export const UploadProjectModal = (props) => {
   const { isShow, onCancel, onUpload, data } = props;
   const [form] = useForm();
+  const [fileList, setFileList] = useState([]);
   const folderData = [
     {
       name: 'models',
@@ -23,9 +25,16 @@ export const UploadProjectModal = (props) => {
     });
   };
 
-  const uploadFile = (options) => {
+  const uploadFile = (info) => {
+    let fileList = [...info.fileList];
+    const list = fileList.filter(
+      (item) => item.type === 'application/x-zip-compressed',
+    );
+    setFileList(list);
+  };
+
+  const customUpload = (options) => {
     const { file, onSuccess } = options;
-    console.log(file);
     onSuccess('Ok');
   };
   return (
@@ -60,7 +69,7 @@ export const UploadProjectModal = (props) => {
             ))}
           </Select>
         </Form.Item>
-        <Form.Item
+        {/* <Form.Item
           label="Folder"
           name="folder"
           initialValue={folderData[0].value}
@@ -72,9 +81,16 @@ export const UploadProjectModal = (props) => {
               </Option>
             ))}
           </Select>
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item label="Upload file" name="file">
-          <Upload multiple={false} maxCount={1} customRequest={uploadFile}>
+          <Upload
+            multiple={false}
+            maxCount={1}
+            onChange={uploadFile}
+            accept=".zip"
+            fileList={fileList}
+            customRequest={customUpload}
+          >
             <Button icon={<UploadOutlined />}>Upload</Button>
           </Upload>
         </Form.Item>

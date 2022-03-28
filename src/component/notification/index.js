@@ -11,7 +11,7 @@ const NOTIFICATION_DURATION = 5000;
 const addNotification = (
   message,
   type = NOTIFICATION_TYPE.INFO,
-  title = 'Thông báo',
+  title = 'Notification',
   duration = NOTIFICATION_DURATION,
 ) => {
   Store.addNotification({

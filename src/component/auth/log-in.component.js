@@ -5,13 +5,28 @@ import {
   EyeTwoTone,
   UserOutlined,
   LockOutlined,
+  MailOutlined,
 } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
+import { login } from '../../service/api';
+import addNotification, { NOTIFICATION_TYPE } from '../notification';
+import { setItem } from '../../utils';
 
 export const LogIn = () => {
   const history = useHistory();
   const onFinish = (values) => {
-    history.push('/edit');
+    login(values)
+      .then((res) => {
+        const data = res.data;
+        localStorage.setItem('token', data.token);
+        setItem('user', data.user);
+        history.push('/edit');
+      })
+      .catch(function (err) {
+        if (err.response)
+          addNotification(err.response.data.message, NOTIFICATION_TYPE.ERROR);
+        else addNotification(err, NOTIFICATION_TYPE.ERROR);
+      });
   };
   return (
     <>
@@ -39,15 +54,19 @@ export const LogIn = () => {
             <Divider style={{ marginBottom: 30 }} />
             <Space direction="vertical">
               <Form.Item
-                name="username"
+                name="email"
                 wrapperCol={{ span: 24 }}
                 rules={[
-                  { required: true, message: 'Please input your username!' },
+                  { required: true, message: 'Please input your email!' },
+                  {
+                    pattern: /\S+@\S+\.\S+/,
+                    message: 'Not email format!',
+                  },
                 ]}
               >
                 <Input
-                  prefix={<UserOutlined className="site-form-item-icon" />}
-                  placeholder="Enter username..."
+                  prefix={<MailOutlined className="site-form-item-icon" />}
+                  placeholder="Enter email..."
                 />
               </Form.Item>
 

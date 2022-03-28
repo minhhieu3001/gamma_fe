@@ -5,10 +5,18 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ReactNotifications } from 'react-notifications-component';
 
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import { reducer } from './redux/reducer';
+
+let store = createStore(reducer);
+
 ReactDOM.render(
   <React.StrictMode>
     <ReactNotifications />
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root'),
 );

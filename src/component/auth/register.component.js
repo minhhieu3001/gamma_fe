@@ -6,6 +6,7 @@ import {
   UserOutlined,
   LockOutlined,
   ProjectOutline,
+  MailOutlined,
 } from '@ant-design/icons';
 import addNotification, { NOTIFICATION_TYPE } from '../notification';
 import { useHistory } from 'react-router-dom';
@@ -19,7 +20,11 @@ export const Register = () => {
         addNotification('Tạo tài khoản thành công', NOTIFICATION_TYPE.SUCCESS);
         history.push('/');
       })
-      .catch((err) => addNotification(err.message, NOTIFICATION_TYPE.ERROR));
+      .catch((err) => {
+        if (err.response)
+          addNotification(err.response.data.message, NOTIFICATION_TYPE.ERROR);
+        else addNotification(err, NOTIFICATION_TYPE.ERROR);
+      });
   };
   return (
     <>
@@ -71,7 +76,7 @@ export const Register = () => {
                 ]}
               >
                 <Input
-                  prefix={<UserOutlined className="site-form-item-icon" />}
+                  prefix={<MailOutlined className="site-form-item-icon" />}
                   placeholder="Enter email..."
                 />
               </Form.Item>

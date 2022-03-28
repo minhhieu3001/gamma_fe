@@ -19,9 +19,19 @@ export const login = (params) => {
 };
 
 export const createPj = (params) => {
-  return axiosInstance.post('/api/project', params);
+  let config = {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+    },
+  };
+  return axiosInstance.post('/api/project', params, config);
 };
 
 export const simulate = (params) => {
-  return axiosInstance.put('/api/simulate', params);
+  let config = {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+    },
+  };
+  return axiosInstance.put('/api/simulate', params, config);
 };
