@@ -169,7 +169,7 @@ const Edit = (props) => {
       const path = filePathList.find((file) => file.id === targetKey);
       getFile({ path: path.path, user_id: user.id })
         .then((res) => {
-          const content = res.data.file;
+          const content = res.data.file.original;
           setPanes([
             ...panes,
             {
@@ -190,9 +190,9 @@ const Edit = (props) => {
               isUpdate: false,
             },
           ]);
-        });
+        })
+        .finally(() => setActiveKey(String(targetKey)));
     }
-    setActiveKey(String(targetKey));
   };
 
   const handleCloseModal = () => {
