@@ -1,6 +1,7 @@
 import {
   CaretRightOutlined,
   PauseOutlined,
+  RedoOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { Avatar, Button, Col, Dropdown, Layout, Tabs } from 'antd';
@@ -109,6 +110,12 @@ const Simulation = (props) => {
                   shape="circle"
                   icon={<CaretRightOutlined />}
                   onClick={() => setPlay(true)}
+                  style={{ marginRight: 5 }}
+                />
+                <Button
+                  shape="circle"
+                  icon={<RedoOutlined />}
+                  onClick={() => setPlay(false, () => setStep(0))}
                 />
               </div>
               <Tabs

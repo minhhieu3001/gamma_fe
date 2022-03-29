@@ -117,6 +117,12 @@ export const UploadProjectModal = (props) => {
           >
             <Button icon={<UploadOutlined />}>Upload</Button>
           </Upload>
+          <div className="">
+            * Only accept zip file containing{' '}
+            <span style={{ fontStyle: 'italic' }}>project folder</span>, which
+            includes <span style={{ fontStyle: 'italic' }}>models</span> and{' '}
+            <span style={{ fontStyle: 'italic' }}>includes</span> folder
+          </div>
         </Form.Item>
       </Form>
     </Modal>

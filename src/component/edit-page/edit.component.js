@@ -260,7 +260,13 @@ const Edit = (props) => {
     );
     if (!pj) return;
     const path = filePathList.find((item) => item.id === modal.id).path;
-    const xml = XMLGenerator(model, data.parameterList, outputList, path);
+    const xml = XMLGenerator(
+      model,
+      data.parameterList,
+      outputList,
+      `userProjects/${user.id}/` + path,
+    );
+    console.log(xml);
     setInputXMl({
       model,
       parameterList: data.parameterList || [],
