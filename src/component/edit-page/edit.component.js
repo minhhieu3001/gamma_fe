@@ -36,8 +36,8 @@ import { XMLGenerator } from '../common/XML-generator';
 import { ParameterModal } from './modal/parameterModal.component';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { HeaderComp } from '../common/header.component';
-import { getItem } from '../../utils';
-import { createPj } from '../../service/api';
+import { getItem, transformTree } from '../../utils';
+import { createPj, getFile, list, upload } from '../../service/api';
 import addNotification, { NOTIFICATION_TYPE } from '../notification';
 import { connect } from 'react-redux';
 
@@ -94,18 +94,26 @@ const Edit = (props) => {
   });
   const [panes, setPanes] = useState([]);
   const [activeKey, setActiveKey] = useState([]);
-  const [projectTree, setProjectTree] = useState(projectTreeConst);
+  const [projectTree, setProjectTree] = useState([]);
+  const [filePathList, setFilePathList] = useState([]);
   const [dataColumn, setDataColumn] = useState([]);
   const [modal, setModal] = useState({ type: null, isOpen: false, id: null });
+  const [user, setUser] = useState();
   const history = useHistory();
 
   const onSearch = () => {};
 
   useEffect(() => {
-    const paneList = [].map((item) => ({ ...item, isUpdate: false }));
-    setPanes(paneList);
-    setActiveKey(paneList[0]?.id);
     setDataColumn(dataSource);
+    const user = getItem('user');
+    if (!user) history.push('/login');
+    setUser(user);
+    list({ user_id: user.id }).then((res) => {
+      const data = res.data.data;
+      setProjectTree(data);
+      const transform = transformTree(data);
+      setFilePathList(transform);
+    });
   }, []);
 
   const handleSave = (row) => {
@@ -127,25 +135,27 @@ const Edit = (props) => {
           isUpdate: true,
         },
       });
-      console.log(panes);
       return panes;
     });
   };
+
+  useEffect(() => console.log(typeof activeKey), [activeKey]);
 
   const onChange = (activeKey) => {
     setActiveKey(activeKey);
   };
   const onEdit = (targetKey, action) => {
-    if (action === 'remove') onRemoveTab(targetKey);
+    if (action === 'remove') onRemoveTab(Number(targetKey));
   };
 
   const onRemoveTab = (targetKey) => {
     const paneTmp = panes.filter((item) => item.id !== targetKey);
     setPanes(paneTmp);
-    setActiveKey(paneTmp[0]?.id);
+    setActiveKey(String(paneTmp[0]?.id));
   };
 
-  const onAddTabs = (targetKey) => {
+  const onAddTabs = (id) => {
+    const targetKey = Number(id);
     const pane = panes.find((item) => item.id === targetKey);
     if (!pane) {
       const addProject = projectTree.find(
@@ -156,17 +166,33 @@ const Edit = (props) => {
       const file =
         addProject.includes.find((include) => include.id === targetKey) ||
         addProject.models.find((model) => model.id === targetKey);
-      setPanes([
-        ...panes,
-        {
-          name: file.name,
-          id: targetKey,
-          content: 'this is pane ' + file.id,
-          isUpdate: false,
-        },
-      ]);
+      const path = filePathList.find((file) => file.id === targetKey);
+      getFile({ path: path.path, user_id: user.id })
+        .then((res) => {
+          const content = res.data.file;
+          setPanes([
+            ...panes,
+            {
+              name: file.filename,
+              id: targetKey,
+              content: content,
+              isUpdate: false,
+            },
+          ]);
+        })
+        .catch((err) => {
+          setPanes([
+            ...panes,
+            {
+              name: file.filename,
+              id: targetKey,
+              content: 'This file is not supported!',
+              isUpdate: false,
+            },
+          ]);
+        });
     }
-    setActiveKey(targetKey);
+    setActiveKey(String(targetKey));
   };
 
   const handleCloseModal = () => {
@@ -197,8 +223,25 @@ const Edit = (props) => {
     handleCloseModal();
   };
 
-  const handleUploadProject = (data) => {
-    handleCloseModal();
+  const handleUploadProject = (data, file) => {
+    var formData = new FormData();
+    formData.append('user_id', user.id);
+    formData.append('payload', file);
+    upload(formData)
+      .then((response) => {
+        console.log(response.data);
+        list({ user_id: user.id }).then((res) => {
+          const data = res.data.data;
+          setProjectTree(data);
+          const transform = transformTree(data);
+          setFilePathList(transform);
+        });
+        addNotification('Upload file successfully', NOTIFICATION_TYPE.SUCCESS);
+        handleCloseModal();
+      })
+      .catch((err) =>
+        addNotification(err?.response?.data?.message, NOTIFICATION_TYPE.ERROR),
+      );
   };
 
   const handleSimulation = (data) => {
@@ -275,11 +318,11 @@ const Edit = (props) => {
                         placeholder="input search text"
                         allowClear
                         onSearch={onSearch}
-                        style={{ width: 180 }}
+                        style={{ width: 210 }}
                       />
                     </Col>
                     <Col>
-                      <Tooltip title="Create new project">
+                      {/* <Tooltip title="Create new project">
                         <Button
                           type="text"
                           shape="circle"
@@ -288,8 +331,8 @@ const Edit = (props) => {
                             setModal({ type: 'CREATE', isOpen: true, id: null })
                           }
                         />
-                      </Tooltip>
-                      <Tooltip title="Upload file">
+                      </Tooltip> */}
+                      <Tooltip title="Upload Project">
                         <Button
                           type="text"
                           shape="circle"
@@ -329,7 +372,7 @@ const Edit = (props) => {
                               icon={<FileTextOutlined />}
                               onClick={() => onAddTabs(include.id)}
                             >
-                              {include.name}
+                              {include.filename}
                             </Menu.Item>
                           ))}
                         </SubMenu>
@@ -344,7 +387,7 @@ const Edit = (props) => {
                               icon={<FileTextOutlined />}
                               onClick={() => onAddTabs(model.id)}
                             >
-                              {model.name}
+                              {model.filename}
                             </Menu.Item>
                           ))}
                         </SubMenu>

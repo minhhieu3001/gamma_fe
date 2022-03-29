@@ -9,6 +9,7 @@ export const UploadProjectModal = (props) => {
   const { isShow, onCancel, onUpload, data } = props;
   const [form] = useForm();
   const [fileList, setFileList] = useState([]);
+  const [file, setFile] = useState();
   const folderData = [
     {
       name: 'models',
@@ -21,7 +22,7 @@ export const UploadProjectModal = (props) => {
   ];
   const onSubmit = () => {
     form.validateFields().then((data) => {
-      onUpload(data);
+      onUpload(data, file);
     });
   };
 
@@ -37,10 +38,17 @@ export const UploadProjectModal = (props) => {
     const { file, onSuccess } = options;
     onSuccess('Ok');
   };
+
+  const getFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
+  };
   return (
     <Modal
       visible={isShow}
-      title="Upload file"
+      title="Upload Project"
       okText="Upload"
       onCancel={onCancel}
       onOk={onSubmit}
@@ -51,7 +59,7 @@ export const UploadProjectModal = (props) => {
         labelCol={{ span: 5 }}
         wrapperCol={{ span: 10 }}
       >
-        <Form.Item
+        {/* <Form.Item
           label="Project"
           name="projectId"
           rules={[
@@ -68,7 +76,7 @@ export const UploadProjectModal = (props) => {
               </Option>
             ))}
           </Select>
-        </Form.Item>
+        </Form.Item> */}
         {/* <Form.Item
           label="Folder"
           name="folder"
@@ -82,7 +90,11 @@ export const UploadProjectModal = (props) => {
             ))}
           </Select>
         </Form.Item> */}
-        <Form.Item label="Upload file" name="file">
+        <Form.Item
+          label="Upload Project"
+          name="file"
+          getValueFromEvent={getFile}
+        >
           <Upload
             multiple={false}
             maxCount={1}
@@ -90,6 +102,18 @@ export const UploadProjectModal = (props) => {
             accept=".zip"
             fileList={fileList}
             customRequest={customUpload}
+            beforeUpload={(file) => {
+              const reader = new FileReader();
+
+              reader.onload = (e) => {
+                console.log(e.target.result);
+              };
+              reader.readAsText(file);
+              setFile(file);
+
+              // Prevent upload
+              return false;
+            }}
           >
             <Button icon={<UploadOutlined />}>Upload</Button>
           </Upload>

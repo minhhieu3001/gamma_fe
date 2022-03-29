@@ -30,6 +30,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "5.0.0",
     "react-select": "^5.2.2",
+    "read-excel-file": "^5.2.28",
     "redux": "^4.1.2",
     "web-vitals": "^2.1.4",
     "xmlbuilder": "^15.1.1"

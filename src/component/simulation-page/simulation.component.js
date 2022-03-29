@@ -9,11 +9,13 @@ import { HeaderComp } from '../common/header.component';
 import './style.scss';
 import { useEffect, useState } from 'react';
 import { imageUrls } from '../constant';
-import { useInterval } from '../../utils';
+import { getItem, useInterval } from '../../utils';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import { simulate } from '../../service/api';
 
 const Simulation = (props) => {
+  const { id } = props.match.params;
   const { inputXml, setInputXMl } = props;
   const [activeKey, setActiveKey] = useState();
   const [imageUrl, setImageUrl] = useState('');
@@ -25,12 +27,17 @@ const Simulation = (props) => {
     { id: 2, name: 'main_display' },
   ]);
   const [first, setFirst] = useState(true);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!inputXml) {
       history.push('/edit');
       return;
     }
+    const user = getItem('user');
+    if (!user) history.push('/login');
+    var formData = new FormData();
+    simulate({});
     const paneList = (inputXml?.outputList || []).filter((item) =>
       imageUrls.find((url) => url.includes(item.name)),
     );
@@ -42,17 +49,17 @@ const Simulation = (props) => {
     const tabs = {};
     inputXml?.outputList.map((item) => {
       tabs[item.name] = imageUrls.filter((url) => url.includes(item.name));
-      console.log(tabs);
     });
     setImageUrl(tabs);
     setFirst(false);
+    setLoading(true);
     return () => {
       clearInterval();
     };
   }, []);
 
   useInterval(() => {
-    if (first) return;
+    if (first || isLoading) return;
     let maxStep = 0;
     inputXml?.outputList.map((item) => {
       if (item?.framerate && item?.framerate > maxStep)

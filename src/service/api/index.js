@@ -18,6 +18,40 @@ export const login = (params) => {
   return axiosInstance.post('/api/login', params);
 };
 
+export const list = (params) => {
+  let config = {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+  };
+  return axiosInstance.post('/api/project/list', params, config);
+};
+
+export const upload = (payload) => {
+  let config = {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+      'X-Requested-With': 'XMLHttpRequest',
+      'Content-Type': 'multipart/form-data',
+    },
+  };
+  return axiosInstance.post('/api/upload', payload, config);
+};
+
+export const getFile = (payload) => {
+  let config = {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+  };
+  return axiosInstance.post('/api/file/read', payload, config);
+};
+
 export const createPj = (params) => {
   let config = {
     headers: {
