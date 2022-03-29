@@ -37,7 +37,7 @@ import { ParameterModal } from './modal/parameterModal.component';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { HeaderComp } from '../common/header.component';
 import { getItem, transformTree } from '../../utils';
-import { createPj, getFile, list, upload } from '../../service/api';
+import { createPj, deletePj, getFile, list, upload } from '../../service/api';
 import addNotification, { NOTIFICATION_TYPE } from '../notification';
 import { connect } from 'react-redux';
 
@@ -219,7 +219,19 @@ const Edit = (props) => {
   };
 
   const handleDeleteProject = (id) => {
-    setProjectTree((data) => data.filter((item) => item.id !== id));
+    deletePj({ user_id: user.id, project_id: id })
+      .then((res) => {
+        addNotification('Delete successfully', NOTIFICATION_TYPE.SUCCESS);
+        list({ user_id: user.id }).then((res) => {
+          const data = res.data.data;
+          setProjectTree(data);
+          const transform = transformTree(data);
+          setFilePathList(transform);
+        });
+      })
+      .catch((err) => {
+        addNotification(err?.response?.data?.message, NOTIFICATION_TYPE.ERROR);
+      });
     handleCloseModal();
   };
 

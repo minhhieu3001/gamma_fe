@@ -50,6 +50,17 @@ export const getFile = (payload) => {
   return axiosInstance.post('/api/file/read', payload, config);
 };
 
+export const deletePj = (payload) => {
+  let config = {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+  };
+  return axiosInstance.post('/api/project/delete', payload, config);
+};
+
 export const createPj = (params) => {
   let config = {
     headers: {
