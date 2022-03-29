@@ -306,7 +306,7 @@ const Edit = (props) => {
                   defaultOpenKeys={['sub1']}
                   style={{
                     height: '100%',
-                    maxHeight: 600,
+                    maxHeight: '100vh',
                     overflowY: 'scroll',
                     overflowX: 'hidden',
                     width: 300,
