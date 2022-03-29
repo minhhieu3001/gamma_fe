@@ -247,19 +247,20 @@ const Edit = (props) => {
   const handleSimulation = (data) => {
     const model = {
       id: modal.id,
-      sourcePath: './predatorPrey/predatorPrey.gaml',
       finalStep: data.finalStep,
-      until: modal.until,
+      until: data.until,
       experiment: data.experiment,
     };
     const outputList = data.outputList.map((item, index) => ({
       ...item,
       id: index,
     }));
-    const xml = XMLGenerator(model, data.parameterList, outputList);
     const pj = projectTree.find((item) =>
       item.models.find((model) => model.id === modal.id),
     );
+    if (!pj) return;
+    const path = filePathList.find((item) => item.id === modal.id).path;
+    const xml = XMLGenerator(model, data.parameterList, outputList, path);
     setInputXMl({
       model,
       parameterList: data.parameterList || [],

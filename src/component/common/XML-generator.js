@@ -1,6 +1,11 @@
 import Builder from 'xmlbuilder';
 
-export const XMLGenerator = (model, parameterList = [], outputList = []) => {
+export const XMLGenerator = (
+  model,
+  parameterList = [],
+  outputList = [],
+  path = '',
+) => {
   const parameters = parameterList.map((item) => ({
     Parameter: {
       '@name': item?.name,
@@ -19,7 +24,7 @@ export const XMLGenerator = (model, parameterList = [], outputList = []) => {
     Experiment_plan: {
       Simulation: {
         '@id': model?.id,
-        '@sourcePath': model?.sourcePath,
+        '@sourcePath': path,
         '@finalStep': model?.finalStep,
         '@until': model?.until,
         '@experiment': model?.experiment,

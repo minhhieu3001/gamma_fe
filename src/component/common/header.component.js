@@ -38,12 +38,12 @@ export const HeaderComp = (props) => {
           alt="gamma-icon"
           width={50}
           height={50}
-          style={{ marginLeft: 20 }}
+          style={{ marginLeft: 30 }}
         />
       </Col>
 
       <Col span={10}>
-        <h1 style={{ color: '#fff' }}>GAMMA</h1>
+        <h1 style={{ color: '#fff' }}>ASF HN</h1>
       </Col>
 
       <Col span={12}>
