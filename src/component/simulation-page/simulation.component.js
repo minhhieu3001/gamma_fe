@@ -13,6 +13,7 @@ import { getItem, useInterval } from '../../utils';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { simulate } from '../../service/api';
+import addNotification, { NOTIFICATION_TYPE } from '../notification';
 
 const Simulation = (props) => {
   const { id } = props.match.params;
@@ -30,29 +31,41 @@ const Simulation = (props) => {
   const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!inputXml) {
+    if (!inputXml || !inputXml.xml || !inputXml.projectName) {
       history.push('/edit');
       return;
     }
     const user = getItem('user');
     if (!user) history.push('/login');
     var formData = new FormData();
-    simulate({});
-    const paneList = (inputXml?.outputList || []).filter((item) =>
-      imageUrls.find((url) => url.includes(item.name)),
-    );
-    if (!paneList[0]) {
-      history.push('/edit');
-      return;
-    }
-    setPanes(paneList);
-    const tabs = {};
-    inputXml?.outputList.map((item) => {
-      tabs[item.name] = imageUrls.filter((url) => url.includes(item.name));
-    });
-    setImageUrl(tabs);
-    setFirst(false);
-    setLoading(true);
+    formData.append('user_id', user.id);
+    formData.append('project_name', inputXml.projectName);
+    formData.append('xmlfile', new File([inputXml.xml], 'input.xml'));
+    simulate(formData)
+      .then((res) => {
+        const urls = res.data.urls[0] ? res.data.urls : imageUrls;
+        const paneList = (inputXml?.outputList || []).filter((item) =>
+          urls.find((url) => url.includes(item.name)),
+        );
+        if (!paneList[0]) {
+          addNotification('Empty output simulation!', NOTIFICATION_TYPE.ERROR);
+          setTimeout(() => history.push('/edit'), 2000);
+          return;
+        }
+        setPanes(paneList);
+        const tabs = {};
+        inputXml?.outputList.map((item) => {
+          tabs[item.name] = urls.filter((url) => url.includes(item.name));
+        });
+        setImageUrl(tabs);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setFirst(false);
+        setLoading(false);
+      });
     return () => {
       clearInterval();
     };

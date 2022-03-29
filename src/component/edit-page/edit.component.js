@@ -257,7 +257,16 @@ const Edit = (props) => {
       id: index,
     }));
     const xml = XMLGenerator(model, data.parameterList, outputList);
-    setInputXMl({ model, parameterList: data.parameterList || [], outputList });
+    const pj = projectTree.find((item) =>
+      item.models.find((model) => model.id === modal.id),
+    );
+    setInputXMl({
+      model,
+      parameterList: data.parameterList || [],
+      outputList,
+      xml,
+      projectName: pj?.name,
+    });
     const id = modal.id;
     handleCloseModal();
     history.push('/simulation/' + id);
