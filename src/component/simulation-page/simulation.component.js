@@ -4,7 +4,7 @@ import {
   RedoOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { Avatar, Button, Col, Dropdown, Layout, Tabs } from 'antd';
+import { Avatar, Button, Col, Dropdown, Layout, Spin, Tabs } from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
 import { HeaderComp } from '../common/header.component';
 import './style.scss';
@@ -24,10 +24,7 @@ const Simulation = (props) => {
   const [step, setStep] = useState(0);
   const [play, setPlay] = useState(true);
   const history = useHistory();
-  const [panes, setPanes] = useState([
-    { id: 1, name: 'main_display' },
-    { id: 2, name: 'main_display' },
-  ]);
+  const [panes, setPanes] = useState([]);
   const [first, setFirst] = useState(true);
   const [isLoading, setLoading] = useState(true);
 
@@ -44,13 +41,14 @@ const Simulation = (props) => {
     formData.append('xmlfile', new File([inputXml.xml], 'input.xml'));
     simulate(formData)
       .then((res) => {
-        const urls = res.data.urls[0] ? res.data.urls : imageUrls;
+        console.log(res.data);
+        const urls = res.data.urls || [];
         const paneList = (inputXml?.outputList || []).filter((item) =>
           urls.find((url) => url.includes(item.name)),
         );
         if (!paneList[0]) {
           addNotification('Empty output simulation!', NOTIFICATION_TYPE.ERROR);
-          setTimeout(() => history.push('/edit'), 2000);
+          // setTimeout(() => history.push('/edit'), 2000);
           return;
         }
         setPanes(paneList);
@@ -87,73 +85,83 @@ const Simulation = (props) => {
   const onChange = () => {};
   return (
     <>
-      <Layout style={{ height: '100vh' }}>
-        <HeaderComp></HeaderComp>
-        <Content style={{ padding: '0 0px' }}>
-          <Layout className="site-layout-background" style={{ height: '90vh' }}>
-            <Content
-              style={{
-                padding: '10px 24px 10px 24px',
-                minHeight: 280,
-                position: 'relative',
-              }}
+      <Spin spinning={isLoading}>
+        <Layout style={{ height: '100vh' }}>
+          <HeaderComp></HeaderComp>
+          <Content style={{ padding: '0 0px' }}>
+            <Layout
+              className="site-layout-background"
+              style={{ height: '90vh' }}
             >
-              <div className="media_comp">
-                <span className="step_text">Step: {step}</span>
-                <Button
-                  shape="circle"
-                  icon={<PauseOutlined />}
-                  onClick={() => setPlay(false)}
-                  style={{ marginRight: 5 }}
-                />
-                <Button
-                  shape="circle"
-                  icon={<CaretRightOutlined />}
-                  onClick={() => setPlay(true)}
-                  style={{ marginRight: 5 }}
-                />
-                <Button
-                  shape="circle"
-                  icon={<RedoOutlined />}
-                  onClick={() => setPlay(false, () => setStep(0))}
-                />
-              </div>
-              <Tabs
-                hideAdd
-                onChange={onChange}
-                activeKey={activeKey}
-                type="card"
+              <Content
+                style={{
+                  padding: '10px 24px 10px 24px',
+                  minHeight: 280,
+                  position: 'relative',
+                }}
               >
-                {panes.map((pane) => {
-                  let index;
-                  if (!imageUrl[pane.name]) index = 0;
-                  else if (imageUrl[pane.name].length > step) index = step;
-                  else index = imageUrl[pane.name].length;
-                  return (
-                    <Tabs.TabPane
-                      key={pane.id}
-                      tab={pane.name}
-                      style={{ margin: 0, width: '100%' }}
-                    >
-                      <div
-                        style={{
-                          height: '80vh',
-                          width: '100vw',
-                          backgroundColor: '#fff',
-                        }}
+                {!isLoading && (
+                  <div className="media_comp">
+                    <span className="step_text">Step: {step}</span>
+                    <Button
+                      shape="circle"
+                      icon={<PauseOutlined />}
+                      onClick={() => setPlay(false)}
+                      style={{ marginRight: 5 }}
+                    />
+                    <Button
+                      shape="circle"
+                      icon={<CaretRightOutlined />}
+                      onClick={() => setPlay(true)}
+                      style={{ marginRight: 5 }}
+                    />
+                    <Button
+                      shape="circle"
+                      icon={<RedoOutlined />}
+                      onClick={() => {
+                        setPlay(false);
+                        setTimeout(() => setStep(0), 0);
+                      }}
+                    />
+                  </div>
+                )}
+                <Tabs
+                  hideAdd
+                  onChange={onChange}
+                  activeKey={activeKey}
+                  type="card"
+                >
+                  {panes.map((pane) => {
+                    let index;
+                    if (!imageUrl[pane.name]) index = 0;
+                    else if (imageUrl[pane.name].length > step) index = step;
+                    else index = imageUrl[pane.name].length;
+                    return (
+                      <Tabs.TabPane
+                        key={pane.id}
+                        tab={pane.name}
+                        style={{ margin: 0, width: '100%' }}
                       >
-                        <div className="main-content_1">
-                          <img src={(imageUrl[pane.name] || [])[index]} />
+                        <div
+                          style={{
+                            height: '80vh',
+                            width: '100vw',
+                            backgroundColor: '#fff',
+                          }}
+                        >
+                          <div className="main-content_1">
+                            <img src={(imageUrl[pane.name] || [])[index]} />
+                          </div>
                         </div>
-                      </div>
-                    </Tabs.TabPane>
-                  );
-                })}
-              </Tabs>
-            </Content>
-          </Layout>
-        </Content>
-      </Layout>
+                      </Tabs.TabPane>
+                    );
+                  })}
+                </Tabs>
+              </Content>
+            </Layout>
+          </Content>
+        </Layout>
+      </Spin>
     </>
   );
 };

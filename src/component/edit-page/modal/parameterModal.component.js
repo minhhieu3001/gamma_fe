@@ -121,18 +121,10 @@ export const ParameterModal = (props) => {
                           required: true,
                           message: 'Missing parameter value',
                         },
-                        {
-                          pattern: /^(?:\d*)$/,
-                          message: 'Must be greater than -1',
-                        },
                       ]}
                       style={{ width: '120px' }}
                     >
-                      <Input
-                        placeholder="Value"
-                        type="number"
-                        style={{ width: '120px' }}
-                      />
+                      <Input placeholder="Value" style={{ width: '120px' }} />
                     </Form.Item>
                     <MinusCircleOutlined onClick={() => remove(name)} />
                   </Space>
