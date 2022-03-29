@@ -297,15 +297,24 @@ const Edit = (props) => {
       outputList,
       `userProjects/${user.id}/` + path,
     );
+    console.log(xml);
+    var maxStep = 0;
+    outputList.map((item) => {
+      const temp = Math.floor(
+        Number(model?.finalStep) / Number(item?.framerate) || 0,
+      );
+      if (temp > maxStep) maxStep = temp;
+    });
     setInputXMl({
       model,
       parameterList: data.parameterList || [],
       outputList,
       xml,
       projectName: pj?.name,
+      maxStep,
     });
     handleCloseModal();
-    history.push('/simulation/' + data.id);
+    history.push('/simulation/' + modal.id);
   };
   return (
     <>

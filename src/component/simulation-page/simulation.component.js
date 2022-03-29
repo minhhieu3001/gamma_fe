@@ -15,6 +15,7 @@ import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { simulate } from '../../service/api';
 import addNotification, { NOTIFICATION_TYPE } from '../notification';
+import { useParams } from 'react-router-dom';
 
 const Simulation = (props) => {
   const { id } = props.match.params;
@@ -37,7 +38,7 @@ const Simulation = (props) => {
     if (!user) history.push('/login');
     var formData = new FormData();
     formData.append('user_id', user.id);
-    formData.append('project_name', inputXml.projectName);
+    formData.append('simulation_id', id);
     formData.append('xmlfile', new File([inputXml.xml], 'input.xml'));
     simulate(formData)
       .then((res) => {
@@ -72,15 +73,10 @@ const Simulation = (props) => {
 
   useInterval(() => {
     if (first || isLoading) return;
-    let maxStep = 0;
-    inputXml?.outputList.map((item) => {
-      if (item?.framerate && item?.framerate > maxStep)
-        maxStep = item?.framerate;
-    });
-    if (step < maxStep && play) {
+    if (step < inputXml?.maxStep && play) {
       setStep(step + 1);
     }
-    if (step >= maxStep) clearInterval();
+    if (step >= inputXml?.maxStep) clearInterval();
   }, 1000);
   const onChange = () => {};
   return (

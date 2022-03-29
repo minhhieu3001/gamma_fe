@@ -31,18 +31,6 @@ export const ParameterModal = (props) => {
       >
         <Descriptions title="Simulation" />
         <Form.Item
-          label="Id"
-          name="id"
-          rules={[
-            {
-              required: true,
-              message: 'Simulation ID is required!',
-            },
-          ]}
-        >
-          <Input placeholder="Enter id" />
-        </Form.Item>
-        <Form.Item
           label="Number of simulation"
           name="finalStep"
           rules={[
