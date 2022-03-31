@@ -34,7 +34,7 @@ export const HeaderComp = (props) => {
     <Header className="header" style={{ padding: 0, display: 'flex' }}>
       <Col span={2}>
         <img
-          src="https://gama-platform.org//resources/images/general/GamaPlatform.png"
+          src="https://uet.vnu.edu.vn/wp-content/uploads/2017/02/logo2_new.png"
           alt="gamma-icon"
           width={50}
           height={50}

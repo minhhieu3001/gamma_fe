@@ -42,7 +42,7 @@ export const Register = () => {
             <Form.Item wrapperCol={{ span: 24 }}>
               <div className="img-contain">
                 <img
-                  src="https://gama-platform.org//resources/images/general/GamaPlatform.png"
+                  src="https://uet.vnu.edu.vn/wp-content/uploads/2017/02/logo2_new.png"
                   alt="gamma-icon"
                   width={50}
                   height={50}
