@@ -1,13 +1,13 @@
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { Form, Modal, Descriptions, Input, Space, Button, Select } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
+import { useEffect } from 'react';
 
 const paramTypes = ['INT', 'FLOAT', 'BOOLEAN', 'STRING'];
 const { Option } = Select;
 
 export const ParameterModal = (props) => {
-  const { isShow, onCancel, onSimulate } = props;
-  const [form] = useForm();
+  const { isShow, onCancel, onSimulate, form } = props;
   const onSubmit = () => {
     form.validateFields().then((data) => {
       onSimulate(data);

@@ -10,6 +10,7 @@ import {
   Tooltip,
   Row,
   Spin,
+  Form,
 } from 'antd';
 import {
   UserOutlined,
@@ -101,6 +102,7 @@ const Edit = (props) => {
   const [modal, setModal] = useState({ type: null, isOpen: false, id: null });
   const [user, setUser] = useState();
   const [loading, setLoading] = useState(true);
+  const [form] = Form.useForm();
   const history = useHistory();
 
   const onSearch = () => {};
@@ -348,6 +350,7 @@ const Edit = (props) => {
               isShow={modal.isOpen}
               onCancel={() => setModal({ type: null, isOpen: false, id: null })}
               onSimulate={handleSimulation}
+              form={form}
             />
           )}
           <HeaderComp />
