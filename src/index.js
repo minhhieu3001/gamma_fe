@@ -9,6 +9,8 @@ import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import { reducer } from './redux/reducer';
 
+window.React = React;
+
 let store = createStore(reducer);
 
 ReactDOM.render(

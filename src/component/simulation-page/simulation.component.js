@@ -35,7 +35,7 @@ const Simulation = (props) => {
       return;
     }
     const user = getItem('user');
-    if (!user) history.push('/login');
+    if (!user) history.push('/');
     var formData = new FormData();
     formData.append('user_id', user.id);
     formData.append('simulation_id', id);

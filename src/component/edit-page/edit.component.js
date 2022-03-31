@@ -108,7 +108,7 @@ const Edit = (props) => {
   useEffect(() => {
     setDataColumn(dataSource);
     const user = getItem('user');
-    if (!user) history.push('/login');
+    if (!user) history.push('/');
     setUser(user);
     list({ user_id: user.id })
       .then((res) => {
