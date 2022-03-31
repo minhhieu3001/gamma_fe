@@ -46,7 +46,13 @@ module.exports = {
       index: '/',
     },
     proxy: {
-      '/': 'http://localhost:80',
+      '/api': 'http://localhost:80',
     },
+  },
+  mode: 'development',
+  performance: {
+    hints: false,
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000,
   },
 };
