@@ -1,6 +1,6 @@
 import { Route, BrowserRouter } from 'react-router-dom';
 import { router } from './router';
-import 'antd/dist/antd.css';
+import 'antd/dist/antd.min.css';
 import 'react-notifications-component/dist/theme.css';
 
 function App() {
