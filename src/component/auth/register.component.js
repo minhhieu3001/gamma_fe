@@ -17,7 +17,10 @@ export const Register = () => {
   const onFinish = (values) => {
     regist(values)
       .then((res) => {
-        addNotification('Tạo tài khoản thành công', NOTIFICATION_TYPE.SUCCESS);
+        addNotification(
+          'Create account successfully',
+          NOTIFICATION_TYPE.SUCCESS,
+        );
         history.push('/');
       })
       .catch((err) => {
