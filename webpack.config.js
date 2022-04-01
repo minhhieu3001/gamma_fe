@@ -40,13 +40,13 @@ module.exports = {
   ],
 
   devServer: {
-    port: 8080,
+    port: 80,
     host: '0.0.0.0',
     historyApiFallback: {
       index: '/',
     },
     proxy: {
-      '/api': 'http://localhost:80',
+      '/api': 'http://localhost:8080',
     },
   },
   mode: 'development',
