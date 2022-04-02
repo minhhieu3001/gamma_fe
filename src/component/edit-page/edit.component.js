@@ -79,23 +79,8 @@ const columns = [
 
 const Edit = (props) => {
   const { setInputXMl } = props;
-  const edtiableColumns = columns.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record) => ({
-        record,
-        editable: col.editable,
-        dataIndex: col.dataIndex,
-        title: col.title,
-        handleSave,
-      }),
-    };
-  });
   const [panes, setPanes] = useState([]);
-  const [activeKey, setActiveKey] = useState([]);
+  const [activeKey, setActiveKey] = useState();
   const [projectTree, setProjectTree] = useState([]);
   const [filePathList, setFilePathList] = useState([]);
   const [dataColumn, setDataColumn] = useState([]);
@@ -106,6 +91,8 @@ const Edit = (props) => {
   const history = useHistory();
 
   const onSearch = () => {};
+
+  useEffect(() => console.log(activeKey), [activeKey]);
 
   useEffect(() => {
     setDataColumn(dataSource);
@@ -126,35 +113,37 @@ const Edit = (props) => {
   }, []);
 
   const handleSave = (row) => {
-    const newData = [...dataColumn];
-    const index = newData.findIndex((item) => row.key === item.key);
-    const item = newData[index];
-    if (isEqual(row, item)) return;
-    newData.splice(index, 1, {
-      ...item,
-      ...row,
-    });
-    setDataColumn(newData);
-    const paneIndex = panes.findIndex((item) => item.id === activeKey);
-    setPanes((panes) => {
-      panes.splice(paneIndex, 1, {
-        ...panes[paneIndex],
-        ...{
-          ...panes[paneIndex],
-          isUpdate: true,
-        },
-      });
-      return panes;
-    });
+    // const newData = [...dataColumn];
+    // const index = newData.findIndex((item) => row.key === item.key);
+    // const item = newData[index];
+    // if (isEqual(row, item)) return;
+    // newData.splice(index, 1, {
+    //   ...item,
+    //   ...row,
+    // });
+    console.log(filePathList);
+    console.log(activeKey);
+    console.log(filePathList.find((item) => item.id === activeKey));
+    console.log(row);
+    // setDataColumn(newData);
+    // const paneIndex = panes.findIndex((item) => item.id === activeKey);
+    // setPanes((panes) => {
+    //   panes.splice(paneIndex, 1, {
+    //     ...panes[paneIndex],
+    //     ...{
+    //       ...panes[paneIndex],
+    //       isUpdate: true,
+    //     },
+    //   });
+    //   return panes;
+    // });
   };
-
-  useEffect(() => console.log(typeof activeKey), [activeKey]);
 
   const onChange = (activeKey) => {
     setActiveKey(activeKey);
   };
   const onEdit = (targetKey, action) => {
-    if (action === 'remove') onRemoveTab(Number(targetKey));
+    if (action === 'remove') onRemoveTab(targetKey);
   };
 
   const onRemoveTab = (targetKey) => {
@@ -164,7 +153,7 @@ const Edit = (props) => {
   };
 
   const onAddTabs = (id) => {
-    const targetKey = Number(id);
+    const targetKey = id;
     const pane = panes.find((item) => item.id === targetKey);
     if (!pane) {
       setLoading(true);
@@ -179,16 +168,66 @@ const Edit = (props) => {
       const path = filePathList.find((file) => file.id === targetKey);
       getFile({ path: path.path, user_id: user.id })
         .then((res) => {
-          const content = res.data.file.original;
-          setPanes([
-            ...panes,
-            {
-              name: file.filename,
-              id: targetKey,
-              content: content,
-              isUpdate: false,
-            },
-          ]);
+          const content = res.data.file.original || '';
+          console.log(path.path);
+          if (path.path.includes('.csv')) {
+            const rows = content.split('\r\n');
+            const columns = rows[0].split(',').map((txt) => ({
+              title: txt,
+              dataIndex: txt.replaceAll(' ', '').toLowerCase(),
+              key: txt.replaceAll(' ', '').toLowerCase(),
+              editable: true,
+            }));
+            columns.unshift({
+              title: '#',
+              width: 60,
+              render: (param, row, index) => index + 1,
+            });
+            const data = [];
+            for (let i = 1; i < rows.length - 1; i++) {
+              const obj = {};
+              rows[i].split(',').map((txt, index) => {
+                obj[
+                  rows[0].split(',')[index].replaceAll(' ', '').toLowerCase()
+                ] = txt;
+              });
+              data.push(obj);
+            }
+            var edtiableColumns = columns.map((col) => {
+              if (!col.editable) {
+                return col;
+              }
+              return {
+                ...col,
+                onCell: (record) => ({
+                  record,
+                  editable: col.editable,
+                  dataIndex: col.dataIndex,
+                  title: col.title,
+                  onMouseLeave: handleSave,
+                }),
+              };
+            });
+            setPanes([
+              ...panes,
+              {
+                name: file.filename,
+                id: targetKey,
+                columns: edtiableColumns,
+                data,
+                isUpdate: false,
+              },
+            ]);
+          } else
+            setPanes([
+              ...panes,
+              {
+                name: file.filename,
+                id: targetKey,
+                content: content,
+                isUpdate: false,
+              },
+            ]);
         })
         .catch((err) => {
           setPanes([
@@ -202,7 +241,7 @@ const Edit = (props) => {
           ]);
         })
         .finally(() => {
-          setActiveKey(String(targetKey));
+          setActiveKey(targetKey);
           setLoading(false);
         });
     }
@@ -299,7 +338,6 @@ const Edit = (props) => {
       outputList,
       `userProjects/${user.id}/` + path,
     );
-    console.log(xml);
     var maxStep = 0;
     outputList.map((item) => {
       const temp = Math.floor(
@@ -536,21 +574,30 @@ const Edit = (props) => {
                         )}
                         <div className="main-content">
                           {pane.name.includes('csv') ? (
-                            <Table
-                              components={{
-                                body: {
-                                  cell: EditableCell,
-                                  row: EditableRow,
-                                },
-                              }}
-                              size="small"
-                              pagination={false}
-                              rowClassName={() => 'editable-row'}
-                              bordered
-                              dataSource={dataColumn}
-                              columns={edtiableColumns}
-                              scroll={{ y: '74vh' }}
-                            />
+                            pane.columns && pane.data ? (
+                              <Table
+                                components={{
+                                  body: {
+                                    cell: EditableCell,
+                                    row: EditableRow,
+                                  },
+                                }}
+                                size="small"
+                                pagination={false}
+                                rowClassName={() => 'editable-row'}
+                                bordered
+                                dataSource={pane.data}
+                                columns={pane.columns}
+                                scroll={{ y: '74vh' }}
+                              />
+                            ) : (
+                              <CodeMirror
+                                value={'Data not found'}
+                                height="80vh"
+                                style={{ userSelect: 'none' }}
+                                editable={false}
+                              />
+                            )
                           ) : (
                             <CodeMirror
                               value={pane.content}
