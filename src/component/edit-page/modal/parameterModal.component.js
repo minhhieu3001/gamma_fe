@@ -66,15 +66,7 @@ export const ParameterModal = (props) => {
           className="param-section"
           style={{ height: '20vh', overflowY: 'auto' }}
         >
-          <Form.List
-            name="parameterList"
-            rules={[
-              {
-                required: true,
-                message: 'Missing parameters',
-              },
-            ]}
-          >
+          <Form.List name="parameterList">
             {(fields, { add, remove }, { errors }) => (
               <>
                 {fields.map(({ key, name, ...restField }, index) => (

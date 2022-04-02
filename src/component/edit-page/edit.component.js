@@ -120,19 +120,16 @@ const Edit = (props) => {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleSave = (row) => {
-    // const newData = [...dataColumn];
-    // const index = newData.findIndex((item) => row.key === item.key);
-    // const item = newData[index];
-    // if (isEqual(row, item)) return;
-    // newData.splice(index, 1, {
-    //   ...item,
-    //   ...row,
+  const handleSave = (row, key, paneList) => {
+    // const pane = panes.find((item) => item.id === key);
+    console.log(paneList);
+    // setPanes((panes) => {
+    //   pane.data = pane.data.map((item) => item.id === row.id && row);
+    //   pane.isUpdate = true;
+    //   console.log(pane);
+    //   return panes.map((item) => (item.id = pane.id && pane));
     // });
-    console.log(filePathList);
-    console.log(activeKey);
-    console.log(filePathList.find((item) => item.id === activeKey));
-    console.log(row);
+    console.log(panes);
     // setDataColumn(newData);
     // const paneIndex = panes.findIndex((item) => item.id === activeKey);
     // setPanes((panes) => {
@@ -177,7 +174,6 @@ const Edit = (props) => {
       getFile({ path: path.path, user_id: user.id })
         .then((res) => {
           const content = res.data.file.original || '';
-          console.log(path.path);
           if (path.path.includes('.csv')) {
             const rows = content.split('\r\n');
             const columns = rows[0].split(',').map((txt) => ({
@@ -199,6 +195,7 @@ const Edit = (props) => {
                   rows[0].split(',')[index].replaceAll(' ', '').toLowerCase()
                 ] = txt;
               });
+              obj.id = i - 1;
               data.push(obj);
             }
             var edtiableColumns = columns.map((col) => {
@@ -212,7 +209,7 @@ const Edit = (props) => {
                   editable: col.editable,
                   dataIndex: col.dataIndex,
                   title: col.title,
-                  onMouseLeave: handleSave,
+                  handleSave: (row) => handleSave(row, targetKey, panes),
                 }),
               };
             });
