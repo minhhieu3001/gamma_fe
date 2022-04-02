@@ -24,9 +24,9 @@ import {
   CloudUploadOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
-import { uniqueId, isEqual } from 'lodash';
+import { uniqueId, isEqual, cloneDeep } from 'lodash';
 import { Tabs, Button } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import './style.scss';
 import { dataSource, projectTreeConst } from '../constant';
@@ -96,11 +96,17 @@ const Edit = (props) => {
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
   const history = useHistory();
+  const paneRef = useRef();
+  const pathRef = useRef();
 
   const onSearch = () => {};
 
   useEffect(() => console.log(activeKey), [activeKey]);
-  useEffect(() => console.log(panes), [panes]);
+  useEffect(() => {
+    paneRef.current = panes;
+    console.log(panes);
+  }, [panes]);
+  useEffect(() => (pathRef.current = filePathList), [filePathList]);
 
   useEffect(() => {
     setDataColumn(dataSource);
@@ -120,28 +126,16 @@ const Edit = (props) => {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleSave = (row, key, paneList) => {
-    // const pane = panes.find((item) => item.id === key);
-    console.log(paneList);
-    // setPanes((panes) => {
-    //   pane.data = pane.data.map((item) => item.id === row.id && row);
-    //   pane.isUpdate = true;
-    //   console.log(pane);
-    //   return panes.map((item) => (item.id = pane.id && pane));
-    // });
-    console.log(panes);
-    // setDataColumn(newData);
-    // const paneIndex = panes.findIndex((item) => item.id === activeKey);
-    // setPanes((panes) => {
-    //   panes.splice(paneIndex, 1, {
-    //     ...panes[paneIndex],
-    //     ...{
-    //       ...panes[paneIndex],
-    //       isUpdate: true,
-    //     },
-    //   });
-    //   return panes;
-    // });
+  const handleSave = (row, key) => {
+    const paneList = cloneDeep(paneRef.current);
+    const pane = paneList.find((item) => item.id === key);
+    pane.data = pane.data.map((item) => {
+      item.id === row.id && console.log(item, row);
+      return item.id === row.id ? row : item;
+    });
+    pane.isUpdate = true;
+    const panes = paneList.map((item) => (item.id === pane.id ? pane : item));
+    setPanes(panes);
   };
 
   const onChange = (activeKey) => {
@@ -209,7 +203,7 @@ const Edit = (props) => {
                   editable: col.editable,
                   dataIndex: col.dataIndex,
                   title: col.title,
-                  handleSave: (row) => handleSave(row, targetKey, panes),
+                  handleSave: (row) => handleSave(row, targetKey),
                 }),
               };
             });
@@ -375,9 +369,29 @@ const Edit = (props) => {
     );
     setPanes(paneTemp);
     const path = filePathList.find((item) => item.id === pane.id).path;
+    let csvContent = '';
+    if (pane.data && pane.columns) {
+      csvContent =
+        pane.columns
+          .filter((item) => item.dataIndex)
+          .map((item) => item.title)
+          .join(',') + '\r\n';
+      const columnIndexes = pane.columns
+        .filter((item) => item.dataIndex)
+        .map((item) => item.dataIndex);
+      csvContent += pane.data
+        .map((item) => {
+          var res = '';
+          res = columnIndexes.map((key) => item[key]).join(',');
+          return res + '\r\n';
+        })
+        .join('');
+    }
+    const content = pane.name.includes('.gaml') ? pane.tempContent : csvContent;
+    console.log(content);
     var formData = new FormData();
     formData.append('user_id', user.id);
-    formData.append('file', new File([pane.tempContent], pane.name));
+    formData.append('file', new File([content], pane.name));
     formData.append('path', path);
     update(formData)
       .then((res) => {
