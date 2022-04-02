@@ -39,6 +39,18 @@ export const upload = (payload) => {
   return axiosInstance.post('/api/upload', payload, config);
 };
 
+export const update = (payload) => {
+  let config = {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+      'X-Requested-With': 'XMLHttpRequest',
+      'Content-Type': 'multipart/form-data',
+    },
+  };
+  return axiosInstance.post('/api/file/update', payload, config);
+};
+
 export const getFile = (payload) => {
   let config = {
     headers: {

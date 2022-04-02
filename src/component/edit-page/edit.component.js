@@ -39,7 +39,14 @@ import { ParameterModal } from './modal/parameterModal.component';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { HeaderComp } from '../common/header.component';
 import { getItem, transformTree } from '../../utils';
-import { createPj, deletePj, getFile, list, upload } from '../../service/api';
+import {
+  createPj,
+  deletePj,
+  getFile,
+  list,
+  update,
+  upload,
+} from '../../service/api';
 import addNotification, { NOTIFICATION_TYPE } from '../notification';
 import { connect } from 'react-redux';
 
@@ -93,6 +100,7 @@ const Edit = (props) => {
   const onSearch = () => {};
 
   useEffect(() => console.log(activeKey), [activeKey]);
+  useEffect(() => console.log(panes), [panes]);
 
   useEffect(() => {
     setDataColumn(dataSource);
@@ -226,6 +234,8 @@ const Edit = (props) => {
                 id: targetKey,
                 content: content,
                 isUpdate: false,
+                isOpen: true,
+                tempContent: content,
               },
             ]);
         })
@@ -298,7 +308,6 @@ const Edit = (props) => {
     formData.append('payload', file);
     upload(formData)
       .then((response) => {
-        console.log(response.data);
         list({ user_id: user.id })
           .then((res) => {
             const data = res.data.data;
@@ -355,6 +364,29 @@ const Edit = (props) => {
     });
     handleCloseModal();
     history.push('/simulation/' + modal.id);
+  };
+
+  const handleSaveFile = (pane) => {
+    const paneTemp = panes.map((item) =>
+      item.id === pane.id
+        ? {
+            ...item,
+            isUpdate: false,
+            content: pane.tempContent,
+          }
+        : item,
+    );
+    setPanes(paneTemp);
+    const path = filePathList.find((item) => item.id === pane.id).path;
+    var formData = new FormData();
+    formData.append('user_id', user.id);
+    formData.append('file', new File([pane.tempContent], pane.name));
+    formData.append('path', path);
+    update(formData)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => console.log(err));
   };
   return (
     <>
@@ -558,15 +590,7 @@ const Edit = (props) => {
                             }}
                             icon={<SaveOutlined style={{ fontSize: 15 }} />}
                             onClick={() => {
-                              const paneTemp = panes.map((item) =>
-                                item.id === pane.id
-                                  ? {
-                                      ...item,
-                                      isUpdate: false,
-                                    }
-                                  : item,
-                              );
-                              setPanes(paneTemp);
+                              handleSaveFile(pane);
                             }}
                           >
                             Save
@@ -600,14 +624,20 @@ const Edit = (props) => {
                             )
                           ) : (
                             <CodeMirror
-                              value={pane.content}
+                              value={pane.content || ''}
                               height="80vh"
-                              onChange={(value) => {
+                              onChange={(value, viewUpdate) => {
+                                const isChange =
+                                  !pane.isOpen && !isEqual(value, pane.content);
                                 const paneTemp = panes.map((item) =>
                                   item.id === pane.id
                                     ? {
                                         ...item,
-                                        isUpdate: !isEqual(value, pane.content),
+                                        isUpdate: isChange,
+                                        isOpen: false,
+                                        tempContent: isChange
+                                          ? value
+                                          : pane.content,
                                       }
                                     : item,
                                 );
