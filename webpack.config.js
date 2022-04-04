@@ -48,6 +48,8 @@ module.exports = {
     proxy: {
       '/api': 'http://localhost:8080',
     },
+    compress: true,
+    allowedHosts: ['.asfsim.ml'],
   },
   mode: 'development',
   performance: {
@@ -55,6 +57,4 @@ module.exports = {
     maxEntrypointSize: 512000,
     maxAssetSize: 512000,
   },
-  compress: true,
-  disableHostCheck: true,
 };
