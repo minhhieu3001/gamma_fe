@@ -130,8 +130,9 @@ const Simulation = (props) => {
                   {panes.map((pane) => {
                     let index;
                     if (!imageUrl[pane.name]) index = 0;
-                    else if (imageUrl[pane.name].length > step) index = step;
-                    else index = imageUrl[pane.name].length;
+                    else if (imageUrl[pane.name].length - 1 > step)
+                      index = step;
+                    else index = imageUrl[pane.name].length - 1;
                     return (
                       <Tabs.TabPane
                         key={pane.id}

@@ -55,4 +55,6 @@ module.exports = {
     maxEntrypointSize: 512000,
     maxAssetSize: 512000,
   },
+  compress: true,
+  disableHostCheck: true,
 };
