@@ -1,0 +1,35 @@
+.hover-pop {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 10;
+  background-color: black;
+  opacity: 0.5;
+  top: 100%;
+  transition-duration: 0.2s;
+  transition-timing-function: linear;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.img-container:hover {
+  cursor: pointer;
+}
+
+.img-container {
+  position: relative;
+  border-style: dashed;
+  border-width: 4;
+  box-shadow: 10;
+}
+
+.img-container:hover .hover-pop {
+  display: block;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}

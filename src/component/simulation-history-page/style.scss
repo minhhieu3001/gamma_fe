@@ -1,0 +1,19 @@
+.fail-container {
+  width: 100vw;
+  height: 90vh;
+  background-color: rgb(157, 157, 157);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .description {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 40%;
+    text-align: center;
+  }
+  .text {
+    font-size: 30px;
+  }
+}

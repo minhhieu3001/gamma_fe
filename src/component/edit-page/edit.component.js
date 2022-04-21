@@ -37,8 +37,8 @@ import { UploadProjectModal } from './modal/uploadProject.component';
 import { XMLGenerator } from '../common/XML-generator';
 import { ParameterModal } from './modal/parameterModal.component';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
-import { HeaderComp } from '../common/header.component';
-import { getItem, transformTree } from '../../utils';
+import HeaderComp from '../common/header.component';
+import { getItem, setItem, transformTree } from '../../utils';
 import {
   createPj,
   deletePj,
@@ -85,7 +85,7 @@ const columns = [
 ];
 
 const Edit = (props) => {
-  const { setInputXMl } = props;
+  const { setInputXMl, isLoading, setLoading } = props;
   const [panes, setPanes] = useState([]);
   const [activeKey, setActiveKey] = useState();
   const [projectTree, setProjectTree] = useState([]);
@@ -93,7 +93,6 @@ const Edit = (props) => {
   const [dataColumn, setDataColumn] = useState([]);
   const [modal, setModal] = useState({ type: null, isOpen: false, id: null });
   const [user, setUser] = useState();
-  const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
   const history = useHistory();
   const paneRef = useRef();
@@ -101,15 +100,23 @@ const Edit = (props) => {
 
   const onSearch = () => {};
 
-  useEffect(() => console.log(activeKey), [activeKey]);
   useEffect(() => {
     paneRef.current = panes;
-    console.log(panes);
   }, [panes]);
   useEffect(() => (pathRef.current = filePathList), [filePathList]);
 
+  const saveTab = () => {
+    const tabs = {
+      ids: panes.map((item) => item.id),
+      activeKey,
+    };
+    setItem('tabs', tabs);
+  };
+
   useEffect(() => {
     setDataColumn(dataSource);
+    setLoading(true);
+    localStorage.removeItem('tabs');
     const user = getItem('user');
     if (!user) history.push('/');
     setUser(user);
@@ -316,6 +323,10 @@ const Edit = (props) => {
       });
   };
 
+  const handleLastestSimulation = () => {
+    history.push('/simulation/' + activeKey + '/history');
+  };
+
   const handleSimulation = (data) => {
     const model = {
       id: modal.id,
@@ -354,6 +365,7 @@ const Edit = (props) => {
       maxStep,
     });
     handleCloseModal();
+    saveTab();
     history.push('/simulation/' + modal.id);
   };
 
@@ -388,7 +400,6 @@ const Edit = (props) => {
         .join('');
     }
     const content = pane.name.includes('.gaml') ? pane.tempContent : csvContent;
-    console.log(content);
     var formData = new FormData();
     formData.append('user_id', user.id);
     formData.append('file', new File([content], pane.name));
@@ -401,70 +412,66 @@ const Edit = (props) => {
   };
   return (
     <>
-      <Spin spinning={loading}>
-        <Layout style={{ height: '100vh' }}>
-          {modal.type === 'CREATE' && modal.isOpen && (
-            <CreateProjectModal
-              isShow={modal.isOpen}
-              onCancel={() => setModal({ type: null, isOpen: false, id: null })}
-              onCreate={handleCreateProject}
-            />
-          )}
-          {modal.type === 'UPLOAD' && modal.isOpen && (
-            <UploadProjectModal
-              isShow={modal.isOpen}
-              onCancel={() => setModal({ type: null, isOpen: false, id: null })}
-              onUpload={handleUploadProject}
-              data={projectTree}
-            />
-          )}
-          {modal.type === 'DELETE' && modal.isOpen && (
-            <DeleteProjectModal
-              isShow={modal.isOpen}
-              onCancel={() => setModal({ type: null, isOpen: false, id: null })}
-              onDelete={handleDeleteProject}
-              data={projectTree}
-            />
-          )}
-          {modal.type === 'PARAMETER' && modal.isOpen && (
-            <ParameterModal
-              isShow={modal.isOpen}
-              onCancel={() => setModal({ type: null, isOpen: false, id: null })}
-              onSimulate={handleSimulation}
-              form={form}
-            />
-          )}
-          <HeaderComp />
-          <Content style={{ padding: '0 0px' }}>
-            <Layout
-              className="site-layout-background"
-              style={{ height: '90vh' }}
-            >
-              <Col>
-                <Sider className="site-layout-background" width={200}>
-                  <Menu
-                    mode="inline"
-                    defaultSelectedKeys={['1']}
-                    defaultOpenKeys={['sub1']}
-                    style={{
-                      height: '100%',
-                      maxHeight: '100vh',
-                      overflowY: 'scroll',
-                      overflowX: 'hidden',
-                      width: 300,
-                    }}
-                  >
-                    <Row>
-                      <Col>
-                        <Search
-                          placeholder="input search text"
-                          allowClear
-                          onSearch={onSearch}
-                          style={{ width: 210 }}
-                        />
-                      </Col>
-                      <Col>
-                        {/* <Tooltip title="Create new project">
+      <Layout style={{ height: '100vh' }}>
+        {modal.type === 'CREATE' && modal.isOpen && (
+          <CreateProjectModal
+            isShow={modal.isOpen}
+            onCancel={() => setModal({ type: null, isOpen: false, id: null })}
+            onCreate={handleCreateProject}
+          />
+        )}
+        {modal.type === 'UPLOAD' && modal.isOpen && (
+          <UploadProjectModal
+            isShow={modal.isOpen}
+            onCancel={() => setModal({ type: null, isOpen: false, id: null })}
+            onUpload={handleUploadProject}
+            data={projectTree}
+          />
+        )}
+        {modal.type === 'DELETE' && modal.isOpen && (
+          <DeleteProjectModal
+            isShow={modal.isOpen}
+            onCancel={() => setModal({ type: null, isOpen: false, id: null })}
+            onDelete={handleDeleteProject}
+            data={projectTree}
+          />
+        )}
+        {modal.type === 'PARAMETER' && modal.isOpen && (
+          <ParameterModal
+            isShow={modal.isOpen}
+            onCancel={() => setModal({ type: null, isOpen: false, id: null })}
+            onSimulate={handleSimulation}
+            form={form}
+          />
+        )}
+        <HeaderComp />
+        <Content style={{ padding: '0 0px' }}>
+          <Layout className="site-layout-background" style={{ height: '90vh' }}>
+            <Col>
+              <Sider className="site-layout-background" width={200}>
+                <Menu
+                  mode="inline"
+                  defaultSelectedKeys={['1']}
+                  defaultOpenKeys={['sub1']}
+                  style={{
+                    height: '100%',
+                    maxHeight: '100vh',
+                    overflowY: 'scroll',
+                    overflowX: 'hidden',
+                    width: 300,
+                  }}
+                >
+                  <Row>
+                    <Col>
+                      <Search
+                        placeholder="input search text"
+                        allowClear
+                        onSearch={onSearch}
+                        style={{ width: 210 }}
+                      />
+                    </Col>
+                    <Col>
+                      {/* <Tooltip title="Create new project">
                         <Button
                           type="text"
                           shape="circle"
@@ -474,199 +481,216 @@ const Edit = (props) => {
                           }
                         />
                       </Tooltip> */}
-                        <Tooltip title="Upload Project">
-                          <Button
-                            type="text"
-                            shape="circle"
-                            icon={<CloudUploadOutlined />}
-                            onClick={() =>
-                              setModal({
-                                type: 'UPLOAD',
-                                isOpen: true,
-                                id: null,
-                              })
-                            }
-                          />
-                        </Tooltip>
-                        <Tooltip title="Delete">
-                          <Button
-                            type="text"
-                            shape="circle"
-                            icon={<DeleteOutlined />}
-                            onClick={() =>
-                              setModal({
-                                type: 'DELETE',
-                                isOpen: true,
-                                id: null,
-                              })
-                            }
-                          />
-                        </Tooltip>
-                      </Col>
-                    </Row>
-                    {projectTree.map((item, index) => {
-                      return (
-                        <SubMenu
-                          key={item.id}
-                          icon={<ProfileOutlined />}
-                          title={item.name}
-                        >
-                          <SubMenu
-                            key={'includes' + item.id}
-                            icon={<FolderOpenOutlined />}
-                            title="includes"
-                          >
-                            {item.includes.map((include) => (
-                              <Menu.Item
-                                key={include.id}
-                                icon={<FileTextOutlined />}
-                                onClick={() => onAddTabs(include.id)}
-                              >
-                                {include.filename}
-                              </Menu.Item>
-                            ))}
-                          </SubMenu>
-                          <SubMenu
-                            key={'models' + item.id}
-                            icon={<FolderOpenOutlined />}
-                            title="models"
-                          >
-                            {item.models.map((model) => (
-                              <Menu.Item
-                                key={model.id}
-                                icon={<FileTextOutlined />}
-                                onClick={() => onAddTabs(model.id)}
-                              >
-                                {model.filename}
-                              </Menu.Item>
-                            ))}
-                          </SubMenu>
-                        </SubMenu>
-                      );
-                    })}
-                  </Menu>
-                </Sider>
-              </Col>
-
-              <Content style={{ padding: '0 24px 0 100px', minHeight: 280 }}>
-                <Tabs
-                  hideAdd
-                  onChange={onChange}
-                  activeKey={activeKey}
-                  type="editable-card"
-                  onEdit={onEdit}
-                >
-                  {panes.map((pane) => (
-                    <TabPane
-                      key={pane.id}
-                      tab={pane.name}
-                      style={{ margin: 0, width: '100%' }}
-                    >
-                      <div
-                        style={{
-                          height: '80vh',
-                          width: '80vw',
-                          backgroundColor: '#fff',
-                        }}
+                      <Tooltip title="Upload Project">
+                        <Button
+                          type="text"
+                          shape="circle"
+                          icon={<CloudUploadOutlined />}
+                          onClick={() =>
+                            setModal({
+                              type: 'UPLOAD',
+                              isOpen: true,
+                              id: null,
+                            })
+                          }
+                        />
+                      </Tooltip>
+                      <Tooltip title="Delete">
+                        <Button
+                          type="text"
+                          shape="circle"
+                          icon={<DeleteOutlined />}
+                          onClick={() =>
+                            setModal({
+                              type: 'DELETE',
+                              isOpen: true,
+                              id: null,
+                            })
+                          }
+                        />
+                      </Tooltip>
+                    </Col>
+                  </Row>
+                  {projectTree.map((item, index) => {
+                    return (
+                      <SubMenu
+                        key={item.id}
+                        icon={<ProfileOutlined />}
+                        title={item.name}
                       >
-                        {pane.name.includes('gaml') && (
-                          <Button
-                            type="primary"
-                            style={{
-                              margin: '15px 10px',
-                              backgroundColor: '#58c282',
-                            }}
-                            icon={
-                              <CaretRightOutlined
-                                color="#fff"
-                                style={{ fontSize: 15 }}
-                              />
-                            }
-                            onClick={() =>
-                              setModal({
-                                isOpen: true,
-                                type: 'PARAMETER',
-                                id: pane.id,
-                              })
-                            }
-                          >
-                            Exp
-                          </Button>
-                        )}
-                        {pane.isUpdate && (
-                          <Button
-                            type="success"
-                            style={{
-                              margin: '15px 10px',
-                            }}
-                            icon={<SaveOutlined style={{ fontSize: 15 }} />}
-                            onClick={() => {
-                              handleSaveFile(pane);
-                            }}
-                          >
-                            Save
-                          </Button>
-                        )}
-                        <div className="main-content">
-                          {pane.name.includes('csv') ? (
-                            pane.columns && pane.data ? (
-                              <Table
-                                components={{
-                                  body: {
-                                    cell: EditableCell,
-                                    row: EditableRow,
-                                  },
-                                }}
-                                size="small"
-                                pagination={false}
-                                rowClassName={() => 'editable-row'}
-                                bordered
-                                dataSource={pane.data}
-                                columns={pane.columns}
-                                scroll={{ y: '74vh' }}
-                              />
-                            ) : (
-                              <CodeMirror
-                                value={'Data not found'}
-                                height="80vh"
-                                style={{ userSelect: 'none' }}
-                                editable={false}
-                              />
-                            )
+                        <SubMenu
+                          key={'includes' + item.id}
+                          icon={<FolderOpenOutlined />}
+                          title="includes"
+                        >
+                          {item.includes.map((include) => (
+                            <Menu.Item
+                              key={include.id}
+                              icon={<FileTextOutlined />}
+                              onClick={() => onAddTabs(include.id)}
+                            >
+                              {include.filename}
+                            </Menu.Item>
+                          ))}
+                        </SubMenu>
+                        <SubMenu
+                          key={'models' + item.id}
+                          icon={<FolderOpenOutlined />}
+                          title="models"
+                        >
+                          {item.models.map((model) => (
+                            <Menu.Item
+                              key={model.id}
+                              icon={<FileTextOutlined />}
+                              onClick={() => onAddTabs(model.id)}
+                            >
+                              {model.filename}
+                            </Menu.Item>
+                          ))}
+                        </SubMenu>
+                      </SubMenu>
+                    );
+                  })}
+                </Menu>
+              </Sider>
+            </Col>
+
+            <Content style={{ padding: '0 24px 0 100px', minHeight: 280 }}>
+              <Tabs
+                hideAdd
+                onChange={onChange}
+                activeKey={activeKey}
+                type="editable-card"
+                onEdit={onEdit}
+              >
+                {panes.map((pane) => (
+                  <TabPane
+                    key={pane.id}
+                    tab={pane.name}
+                    style={{ margin: 0, width: '100%' }}
+                  >
+                    <div
+                      style={{
+                        height: '80vh',
+                        width: '80vw',
+                        backgroundColor: '#fff',
+                      }}
+                    >
+                      {pane.name.includes('gaml') && (
+                        <Button
+                          type="primary"
+                          style={{
+                            margin: '15px 10px',
+                            backgroundColor: '#58c282',
+                          }}
+                          icon={
+                            <CaretRightOutlined
+                              color="#fff"
+                              style={{ fontSize: 15 }}
+                            />
+                          }
+                          onClick={() =>
+                            setModal({
+                              isOpen: true,
+                              type: 'PARAMETER',
+                              id: pane.id,
+                            })
+                          }
+                        >
+                          Exp
+                        </Button>
+                      )}
+                      {pane.name.includes('gaml') && (
+                        <Button
+                          type="primary"
+                          style={{
+                            margin: '15px 10px',
+                            backgroundColor: '#3ea1ff',
+                          }}
+                          icon={
+                            <FileTextOutlined
+                              color="#fff"
+                              style={{ fontSize: 15 }}
+                            />
+                          }
+                          onClick={handleLastestSimulation}
+                        >
+                          Lastest Result
+                        </Button>
+                      )}
+                      {pane.isUpdate && (
+                        <Button
+                          type="success"
+                          style={{
+                            margin: '15px 10px',
+                          }}
+                          icon={<SaveOutlined style={{ fontSize: 15 }} />}
+                          onClick={() => {
+                            handleSaveFile(pane);
+                          }}
+                        >
+                          Save
+                        </Button>
+                      )}
+                      <div className="main-content">
+                        {pane.name.includes('csv') ? (
+                          pane.columns && pane.data ? (
+                            <Table
+                              components={{
+                                body: {
+                                  cell: EditableCell,
+                                  row: EditableRow,
+                                },
+                              }}
+                              size="small"
+                              pagination={false}
+                              rowClassName={() => 'editable-row'}
+                              bordered
+                              dataSource={pane.data}
+                              columns={pane.columns}
+                              scroll={{ y: '74vh' }}
+                            />
                           ) : (
                             <CodeMirror
-                              value={pane.content || ''}
+                              value={'Data not found'}
                               height="80vh"
-                              onChange={(value, viewUpdate) => {
-                                const isChange =
-                                  !pane.isOpen && !isEqual(value, pane.content);
-                                const paneTemp = panes.map((item) =>
-                                  item.id === pane.id
-                                    ? {
-                                        ...item,
-                                        isUpdate: isChange,
-                                        isOpen: false,
-                                        tempContent: isChange
-                                          ? value
-                                          : pane.content,
-                                      }
-                                    : item,
-                                );
-                                setPanes(paneTemp);
-                              }}
                               style={{ userSelect: 'none' }}
+                              editable={false}
                             />
-                          )}
-                        </div>
+                          )
+                        ) : (
+                          <CodeMirror
+                            value={pane.content || ''}
+                            height="80vh"
+                            onChange={(value, viewUpdate) => {
+                              const isChange =
+                                !pane.isOpen && !isEqual(value, pane.content);
+                              const paneTemp = panes.map((item) =>
+                                item.id === pane.id
+                                  ? {
+                                      ...item,
+                                      isUpdate: isChange,
+                                      isOpen: false,
+                                      tempContent: isChange
+                                        ? value
+                                        : pane.content,
+                                    }
+                                  : item,
+                              );
+                              setPanes(paneTemp);
+                            }}
+                            style={{ userSelect: 'none' }}
+                          />
+                        )}
                       </div>
-                    </TabPane>
-                  ))}
-                </Tabs>
-              </Content>
-            </Layout>
-          </Content>
-        </Layout>
-      </Spin>
+                    </div>
+                  </TabPane>
+                ))}
+              </Tabs>
+            </Content>
+          </Layout>
+        </Content>
+      </Layout>
     </>
   );
 };
@@ -674,8 +698,13 @@ const Edit = (props) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     setInputXMl: (value) => dispatch({ type: 'CREATE_INPUT_XML', value }),
+    setLoading: (value) => dispatch({ type: 'SPIN_LOADING', value }),
   };
 };
-const mapStateToProps = () => {};
+const mapStateToProps = (state) => {
+  return {
+    isLoading: state.isLoading,
+  };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Edit);

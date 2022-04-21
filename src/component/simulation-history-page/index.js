@@ -14,11 +14,11 @@ import { DEFAULT_COUNTER, imageUrls } from '../constant';
 import { getItem, useInterval } from '../../utils';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
-import { simulate } from '../../service/api';
+import { simulate, simulateLastest } from '../../service/api';
 import addNotification, { NOTIFICATION_TYPE } from '../notification';
 import { useParams } from 'react-router-dom';
 
-const Simulation = (props) => {
+const SimulationHistory = (props) => {
   const { id } = props.match.params;
   const { inputXml, setInputXMl, setLoading, isLoading } = props;
   const [activeKey, setActiveKey] = useState();
@@ -33,28 +33,28 @@ const Simulation = (props) => {
   const [isFail, setFail] = useState(false);
 
   useEffect(() => {
-    if (!inputXml || !inputXml.xml || !inputXml.projectName) {
+    if (counter === 0) {
       history.push('/edit');
-      return;
     }
+  }, [counter]);
+
+  useEffect(() => {
     const user = getItem('user');
     if (!user) history.push('/');
-    var formData = new FormData();
-    formData.append('user_id', user.id);
-    formData.append('simulation_id', id);
-    formData.append('xmlfile', new File([inputXml.xml], 'input.xml'));
+    setLoading(true);
     var max = 0;
-    simulate(formData)
+    simulateLastest(id)
       .then((res) => {
-        console.log(res.data);
         const data = res?.data?.urls || [];
         const paneList = data?.map((item, index) => ({
           id: index,
           name: item?.name,
         }));
         if (!paneList[0]) {
-          addNotification('Empty output simulation!', NOTIFICATION_TYPE.ERROR);
-          // setTimeout(() => history.push('/edit'), 2000);
+          addNotification(
+            'This model has not been simulated!',
+            NOTIFICATION_TYPE.ERROR,
+          );
           return;
         }
         setPanes(paneList);
@@ -67,7 +67,6 @@ const Simulation = (props) => {
         setImageUrl(tabs);
       })
       .catch((err) => {
-        console.log(err);
         if (err.response)
           addNotification(
             err.response.data.message || 'Something wrong!',
@@ -87,12 +86,12 @@ const Simulation = (props) => {
   }, []);
 
   useInterval(() => {
-    if (first || maxStep) return;
-    if (isFail) setCounter(counter - 1);
+    if (first || isLoading) return;
+    // if (isFail) setCounter(counter - 1);
     if (step < maxStep && play) {
       setStep(step + 1);
     }
-    if (step >= inputXml?.maxStep) clearInterval();
+    if (step >= maxStep) clearInterval();
   }, 1000);
   const onChange = () => {};
   return (
@@ -200,8 +199,8 @@ const mapDispatchToProps = (dispatch) => {
 const mapStateToProps = (state) => {
   return {
     inputXml: state.inputXml,
-    isLoading: state.isLoading,
+    setLoading: state.setLoading,
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Simulation);
+export default connect(mapStateToProps, mapDispatchToProps)(SimulationHistory);

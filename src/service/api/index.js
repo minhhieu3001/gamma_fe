@@ -73,6 +73,28 @@ export const deletePj = (payload) => {
   return axiosInstance.post('/api/project/delete', payload, config);
 };
 
+export const getUser = (id) => {
+  let config = {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+  };
+  return axiosInstance.get(`/api/user/${id}`, config);
+};
+
+export const updateUser = (id, payload) => {
+  let config = {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+  };
+  return axiosInstance.post(`/api/user/update/${id}`, payload, config);
+};
+
 export const createPj = (params) => {
   let config = {
     headers: {
@@ -89,4 +111,23 @@ export const simulate = (params) => {
     },
   };
   return axiosInstance.post('/api/simulate', params, config);
+};
+export const simulateLastest = (id) => {
+  let config = {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+    },
+  };
+  return axiosInstance.post(`/api/simulate/${id}`, config);
+};
+
+export const readList = (payload) => {
+  let config = {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+  };
+  return axiosInstance.post('/api/file/list', payload, config);
 };

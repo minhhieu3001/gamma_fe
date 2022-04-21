@@ -1,6 +1,7 @@
 import { LogIn } from './component/auth/log-in.component';
 import { Register } from './component/auth/register.component';
 import Edit from './component/edit-page/edit.component';
+import SimulationHistoryPage from './component/simulation-history-page';
 import Simulation from './component/simulation-page/simulation.component';
 
 export const router = [
@@ -23,5 +24,10 @@ export const router = [
     name: 'simulation',
     path: '/simulation/:id',
     component: Simulation,
+  },
+  {
+    name: 'simulation',
+    path: '/simulation/:id/history',
+    component: SimulationHistoryPage,
   },
 ];

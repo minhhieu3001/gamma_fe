@@ -11,10 +11,13 @@ import {
 import addNotification, { NOTIFICATION_TYPE } from '../notification';
 import { useHistory } from 'react-router-dom';
 import { regist } from '../../service/api';
+import { useState } from 'react';
 
 export const Register = () => {
+  const [isLoading, setLoading] = useState(false);
   const history = useHistory();
   const onFinish = (values) => {
+    setLoading(true);
     regist(values)
       .then((res) => {
         addNotification(
@@ -27,12 +30,12 @@ export const Register = () => {
         if (err.response)
           addNotification(err.response.data.message, NOTIFICATION_TYPE.ERROR);
         else addNotification(err, NOTIFICATION_TYPE.ERROR);
-      });
+      })
+      .finally(() => setLoading(false));
   };
   return (
     <>
       <div className="container">
-        <div className="background"></div>
         <div className="form-container">
           <Form
             name="basic"
@@ -64,6 +67,7 @@ export const Register = () => {
                 <Input
                   prefix={<UserOutlined className="site-form-item-icon" />}
                   placeholder="Enter username..."
+                  style={{ borderRadius: '10px' }}
                 />
               </Form.Item>
 
@@ -79,6 +83,7 @@ export const Register = () => {
                 ]}
               >
                 <Input
+                  style={{ borderRadius: '10px' }}
                   prefix={<MailOutlined className="site-form-item-icon" />}
                   placeholder="Enter email..."
                 />
@@ -92,6 +97,7 @@ export const Register = () => {
                 ]}
               >
                 <Input.Password
+                  style={{ borderRadius: '10px' }}
                   placeholder="Enter password..."
                   iconRender={(visible) =>
                     visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
@@ -108,6 +114,7 @@ export const Register = () => {
                 ]}
               >
                 <Input.Password
+                  style={{ borderRadius: '10px' }}
                   placeholder="Enter confirm password..."
                   iconRender={(visible) =>
                     visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
@@ -118,11 +125,12 @@ export const Register = () => {
 
               <Form.Item wrapperCol={{ span: 24 }}>
                 <Button
-                  style={{ width: '100%' }}
+                  style={{ width: '100%', borderRadius: '10px' }}
                   type="submit"
                   htmlType="submit"
+                  disabled={isLoading}
                 >
-                  Register
+                  {!isLoading ? 'Register' : 'Register...'}
                 </Button>
               </Form.Item>
 

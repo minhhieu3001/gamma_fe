@@ -1,5 +1,7 @@
 import { uniqueId } from 'lodash';
 
+export const DEFAULT_COUNTER = 5;
+
 export const projectTreeConst = [
   {
     id: uniqueId(),
