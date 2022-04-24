@@ -17,13 +17,14 @@ import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { simulate, simulateLastest } from '../../service/api';
 import addNotification, { NOTIFICATION_TYPE } from '../notification';
 import { useParams } from 'react-router-dom';
+import { isEmpty } from 'lodash';
 
 const SimulationHistory = (props) => {
   const { id } = props.match.params;
   const { inputXml, setInputXMl, setLoading, isLoading } = props;
   const [activeKey, setActiveKey] = useState();
   const [imageUrl, setImageUrl] = useState('');
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(1);
   const [play, setPlay] = useState(true);
   const history = useHistory();
   const [panes, setPanes] = useState([]);
@@ -58,9 +59,9 @@ const SimulationHistory = (props) => {
           return;
         }
         setPanes(paneList);
-        const tabs = {};
+        var tabs = {};
         data.map((item) => {
-          tabs[item?.name] = item?.urls;
+          tabs[item?.name] = item?.url;
           if ((item?.url || []).length > max) max = item?.url?.length;
         });
         setMaxStep(max);
@@ -87,7 +88,7 @@ const SimulationHistory = (props) => {
 
   useInterval(() => {
     if (first || isLoading) return;
-    // if (isFail) setCounter(counter - 1);
+    if (isFail) setCounter(counter - 1);
     if (step < maxStep && play) {
       setStep(step + 1);
     }
@@ -107,7 +108,7 @@ const SimulationHistory = (props) => {
                 position: 'relative',
               }}
             >
-              {!isLoading && !panes[0] && (
+              {!isLoading && !panes[0] && !first && (
                 <div className="fail-container">
                   <div className="description">
                     <span className="text">Simulation fails.</span>
@@ -138,7 +139,7 @@ const SimulationHistory = (props) => {
                     style={{ marginRight: 5 }}
                     onClick={() => {
                       setPlay(false);
-                      setTimeout(() => setStep(0), 0);
+                      setTimeout(() => setStep(1), 0);
                     }}
                   />
                   <Button
@@ -158,8 +159,8 @@ const SimulationHistory = (props) => {
               >
                 {panes.map((pane) => {
                   let index;
-                  if (!imageUrl[pane.name]) index = 0;
-                  else if (imageUrl[pane.name].length - 1 > step) index = step;
+                  if (!imageUrl[pane.name] || step === 0) index = 0;
+                  else if (imageUrl[pane.name].length >= step) index = step - 1;
                   else index = imageUrl[pane.name].length - 1;
                   return (
                     <Tabs.TabPane
@@ -172,11 +173,13 @@ const SimulationHistory = (props) => {
                           height: '80vh',
                           width: '100vw',
                           backgroundColor: '#fff',
+                          position: 'relative',
                         }}
                       >
                         <div className="main-content_1">
                           <img src={(imageUrl[pane.name] || [])[index]} />
                         </div>
+                        <div className="step">Step {index + 1}</div>
                       </div>
                     </Tabs.TabPane>
                   );

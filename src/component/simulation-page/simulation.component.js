@@ -23,7 +23,7 @@ const Simulation = (props) => {
   const { inputXml, setInputXMl, setLoading, isLoading } = props;
   const [activeKey, setActiveKey] = useState();
   const [imageUrl, setImageUrl] = useState('');
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(1);
   const [play, setPlay] = useState(true);
   const history = useHistory();
   const [panes, setPanes] = useState([]);
@@ -47,7 +47,7 @@ const Simulation = (props) => {
     simulate(formData)
       .then((res) => {
         console.log(res.data);
-        const data = res?.data?.urls || [];
+        const data = res?.data?.data || [];
         const paneList = data?.map((item, index) => ({
           id: index,
           name: item?.name,
@@ -58,9 +58,9 @@ const Simulation = (props) => {
           return;
         }
         setPanes(paneList);
-        const tabs = {};
+        var tabs = {};
         data.map((item) => {
-          tabs[item?.name] = item?.urls;
+          tabs[item?.name] = item?.url;
           if ((item?.url || []).length > max) max = item?.url?.length;
         });
         setMaxStep(max);
@@ -108,7 +108,7 @@ const Simulation = (props) => {
                 position: 'relative',
               }}
             >
-              {!isLoading && !panes[0] && (
+              {!isLoading && !panes[0] && !first && (
                 <div className="fail-container">
                   <div className="description">
                     <span className="text">Simulation fails.</span>
@@ -159,8 +159,8 @@ const Simulation = (props) => {
               >
                 {panes.map((pane) => {
                   let index;
-                  if (!imageUrl[pane.name]) index = 0;
-                  else if (imageUrl[pane.name].length - 1 > step) index = step;
+                  if (!imageUrl[pane.name] || step === 0) index = 0;
+                  else if (imageUrl[pane.name].length > step) index = step;
                   else index = imageUrl[pane.name].length - 1;
                   return (
                     <Tabs.TabPane
@@ -173,10 +173,12 @@ const Simulation = (props) => {
                           height: '80vh',
                           width: '100vw',
                           backgroundColor: '#fff',
+                          position: 'relative',
                         }}
                       >
                         <div className="main-content_1">
                           <img src={(imageUrl[pane.name] || [])[index]} />
+                          <div className="step">Step {index + 1}</div>
                         </div>
                       </div>
                     </Tabs.TabPane>
