@@ -118,7 +118,7 @@ export const simulateLastest = (id) => {
       Authorization: 'Bearer ' + localStorage.getItem('token'),
     },
   };
-  return axiosInstance.post(`/api/simulate/${id}`, config);
+  return axiosInstance.get(`/api/simulate/lastest/${id}`, config);
 };
 
 export const readList = (payload) => {
