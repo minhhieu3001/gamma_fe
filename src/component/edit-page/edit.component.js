@@ -98,7 +98,9 @@ const Edit = (props) => {
   const paneRef = useRef();
   const pathRef = useRef();
 
-  const onSearch = () => {};
+  const onSearch = (data) => {
+    refreshData(user.id, data);
+  };
 
   useEffect(() => {
     paneRef.current = panes;
@@ -113,14 +115,13 @@ const Edit = (props) => {
     setItem('tabs', tabs);
   };
 
-  useEffect(() => {
-    setDataColumn(dataSource);
+  const refreshData = (id, name) => {
     setLoading(true);
-    localStorage.removeItem('tabs');
-    const user = getItem('user');
-    if (!user) history.push('/');
-    setUser(user);
-    list({ user_id: user.id })
+    const payload = {
+      user_id: id,
+    };
+    if (name) payload['project_name'] = name;
+    list(payload)
       .then((res) => {
         const data = res.data.data;
         setProjectTree(data);
@@ -131,6 +132,15 @@ const Edit = (props) => {
         addNotification(err?.response?.data?.message, NOTIFICATION_TYPE.ERROR),
       )
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    setDataColumn(dataSource);
+    localStorage.removeItem('tabs');
+    const tempUser = getItem('user');
+    if (!tempUser) history.push('/');
+    setUser(tempUser);
+    refreshData(tempUser.id);
   }, []);
 
   const handleSave = (row, key) => {
