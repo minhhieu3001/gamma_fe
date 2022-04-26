@@ -33,6 +33,13 @@ const Simulation = (props) => {
   const [isFail, setFail] = useState(false);
 
   useEffect(() => {
+    console.log('step', step);
+    console.log('first', step);
+    console.log('play', play);
+    console.log('____________');
+  });
+
+  useEffect(() => {
     setLoading(true);
     if (!inputXml || !inputXml.xml || !inputXml.projectName) {
       history.push('/edit');
