@@ -5,19 +5,17 @@ import {
   RedoOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { Avatar, Button, Col, Dropdown, Layout, Spin, Tabs } from 'antd';
-import { Content, Header } from 'antd/lib/layout/layout';
+import { Button, Layout, Tabs } from 'antd';
+import { Content } from 'antd/lib/layout/layout';
 import HeaderComp from '../common/header.component';
 import './style.scss';
 import { useEffect, useState } from 'react';
-import { DEFAULT_COUNTER, imageUrls } from '../constant';
+import { DEFAULT_COUNTER } from '../constant';
 import { getItem, useInterval } from '../../utils';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
-import { simulate, simulateLastest } from '../../service/api';
+import { simulateLastest } from '../../service/api';
 import addNotification, { NOTIFICATION_TYPE } from '../notification';
-import { useParams } from 'react-router-dom';
-import { isEmpty } from 'lodash';
 
 const SimulationHistory = (props) => {
   const { id } = props.match.params;
@@ -40,20 +38,14 @@ const SimulationHistory = (props) => {
   }, [counter]);
 
   useEffect(() => {
-    console.log('step', step);
-    console.log('first', step);
-    console.log('play', play);
-    console.log('____________');
-  });
-
-  useEffect(() => {
     const user = getItem('user');
     if (!user) history.push('/');
     setLoading(true);
     var max = 0;
     simulateLastest(id)
       .then((res) => {
-        const data = res?.data?.urls || [];
+        console.log(res);
+        const data = res?.data?.data || [];
         const paneList = data?.map((item, index) => ({
           id: index,
           name: item?.name,
@@ -63,6 +55,7 @@ const SimulationHistory = (props) => {
             'This model has not been simulated!',
             NOTIFICATION_TYPE.ERROR,
           );
+          setFail(true);
           return;
         }
         setPanes(paneList);
@@ -132,7 +125,7 @@ const SimulationHistory = (props) => {
                     shape="circle"
                     icon={<PauseOutlined />}
                     onClick={() => setPlay(false)}
-                    style={{ marginRight: 5 }}
+                    style={{ marginRight: 5, marginLeft: 5 }}
                   />
                   <Button
                     shape="circle"

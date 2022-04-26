@@ -33,13 +33,6 @@ const Simulation = (props) => {
   const [isFail, setFail] = useState(false);
 
   useEffect(() => {
-    console.log('step', step);
-    console.log('first', step);
-    console.log('play', play);
-    console.log('____________');
-  });
-
-  useEffect(() => {
     setLoading(true);
     if (!inputXml || !inputXml.xml || !inputXml.projectName) {
       history.push('/edit');
@@ -62,6 +55,7 @@ const Simulation = (props) => {
         }));
         if (!paneList[0]) {
           addNotification('Empty output simulation!', NOTIFICATION_TYPE.ERROR);
+          setFail(true);
           // setTimeout(() => history.push('/edit'), 2000);
           return;
         }
@@ -75,7 +69,6 @@ const Simulation = (props) => {
         setImageUrl(tabs);
       })
       .catch((err) => {
-        console.log(err);
         if (err.response)
           addNotification(
             err.response.data.message || 'Something wrong!',
@@ -95,12 +88,12 @@ const Simulation = (props) => {
   }, []);
 
   useInterval(() => {
-    if (first || maxStep) return;
+    if (first || isLoading) return;
     if (isFail) setCounter(counter - 1);
     if (step < maxStep && play) {
       setStep(step + 1);
     }
-    if (step >= inputXml?.maxStep) clearInterval();
+    if (step >= maxStep) clearInterval();
   }, 1000);
   const onChange = () => {};
   return (
@@ -133,7 +126,7 @@ const Simulation = (props) => {
                     shape="circle"
                     icon={<PauseOutlined />}
                     onClick={() => setPlay(false)}
-                    style={{ marginRight: 5 }}
+                    style={{ marginRight: 5, marginLeft: 5 }}
                   />
                   <Button
                     shape="circle"
@@ -147,7 +140,7 @@ const Simulation = (props) => {
                     style={{ marginRight: 5 }}
                     onClick={() => {
                       setPlay(false);
-                      setTimeout(() => setStep(0), 0);
+                      setTimeout(() => setStep(1), 0);
                     }}
                   />
                   <Button
@@ -168,7 +161,7 @@ const Simulation = (props) => {
                 {panes.map((pane) => {
                   let index;
                   if (!imageUrl[pane.name] || step === 0) index = 0;
-                  else if (imageUrl[pane.name].length > step) index = step;
+                  else if (imageUrl[pane.name].length > step) index = step - 1;
                   else index = imageUrl[pane.name].length - 1;
                   return (
                     <Tabs.TabPane
