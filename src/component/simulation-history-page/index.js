@@ -40,6 +40,13 @@ const SimulationHistory = (props) => {
   }, [counter]);
 
   useEffect(() => {
+    console.log('step', step);
+    console.log('first', step);
+    console.log('play', play);
+    console.log('____________');
+  });
+
+  useEffect(() => {
     const user = getItem('user');
     if (!user) history.push('/');
     setLoading(true);
