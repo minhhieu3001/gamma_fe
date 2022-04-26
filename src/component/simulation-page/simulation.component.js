@@ -61,8 +61,8 @@ const Simulation = (props) => {
         setPanes(paneList);
         var tabs = {};
         data.map((item) => {
-          tabs[item?.name] = item?.url;
-          if ((item?.url || []).length > max) max = item?.url?.length;
+          tabs[item?.name] = item?.urls;
+          if ((item?.urls || []).length > max) max = item?.urls?.length;
         });
         setMaxStep(max);
         setImageUrl(tabs);
