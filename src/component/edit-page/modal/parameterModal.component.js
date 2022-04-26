@@ -7,7 +7,31 @@ const paramTypes = ['INT', 'FLOAT', 'BOOLEAN', 'STRING'];
 const { Option } = Select;
 
 export const ParameterModal = (props) => {
-  const { isShow, onCancel, onSimulate, form } = props;
+  const { isShow, onCancel, onSimulate, form, content } = props;
+  useEffect(() => {
+    form.resetFields();
+    if (content.length > 0) {
+      const parameterList = [];
+      const outputList = [];
+      content.split('\n').map((item) => {
+        const line = item.replace('\t', '').trim();
+        if (line.indexOf('parameter') === 0) {
+          const texts = line?.split(' ') || [];
+          const index = texts?.indexOf('var:');
+          if (index && index < texts.length - 1) {
+            parameterList.push({ name: texts[index + 1] });
+          }
+        } else if (line.indexOf('display') === 0) {
+          const texts = line?.split(' ');
+          if (texts?.length > 1) {
+            outputList.push({ name: texts[1] });
+          }
+        }
+      });
+      form.setFieldsValue({ parameterList, outputList });
+    }
+    return () => console.log('close');
+  }, [content]);
   const onSubmit = () => {
     form.validateFields().then((data) => {
       onSimulate(data);

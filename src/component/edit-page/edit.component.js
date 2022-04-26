@@ -94,6 +94,7 @@ const Edit = (props) => {
   const [modal, setModal] = useState({ type: null, isOpen: false, id: null });
   const [user, setUser] = useState();
   const [form] = Form.useForm();
+  const [currentContent, setCurrentContent] = useState('');
   const history = useHistory();
   const paneRef = useRef();
   const pathRef = useRef();
@@ -147,7 +148,6 @@ const Edit = (props) => {
     const paneList = cloneDeep(paneRef.current);
     const pane = paneList.find((item) => item.id === key);
     pane.data = pane.data.map((item) => {
-      item.id === row.id && console.log(item, row);
       return item.id === row.id ? row : item;
     });
     pane.isUpdate = true;
@@ -379,6 +379,16 @@ const Edit = (props) => {
     history.push('/simulation/' + modal.id);
   };
 
+  const handleOpenParameter = (id, content) => {
+    setCurrentContent(content);
+    console.log(id);
+    setModal({
+      isOpen: true,
+      type: 'PARAMETER',
+      id,
+    });
+  };
+
   const handleSaveFile = (pane) => {
     const paneTemp = panes.map((item) =>
       item.id === pane.id
@@ -449,9 +459,13 @@ const Edit = (props) => {
         {modal.type === 'PARAMETER' && modal.isOpen && (
           <ParameterModal
             isShow={modal.isOpen}
-            onCancel={() => setModal({ type: null, isOpen: false, id: null })}
+            onCancel={() => {
+              setModal({ type: null, isOpen: false, id: null });
+              setCurrentContent('');
+            }}
             onSimulate={handleSimulation}
             form={form}
+            content={currentContent}
           />
         )}
         <HeaderComp />
@@ -600,11 +614,7 @@ const Edit = (props) => {
                             />
                           }
                           onClick={() =>
-                            setModal({
-                              isOpen: true,
-                              type: 'PARAMETER',
-                              id: pane.id,
-                            })
+                            handleOpenParameter(pane.id, pane.content)
                           }
                         >
                           Exp
