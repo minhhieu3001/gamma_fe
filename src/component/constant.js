@@ -1,6 +1,6 @@
 import { uniqueId } from 'lodash';
 
-export const DEFAULT_COUNTER = 5;
+export const DEFAULT_COUNTER = 100;
 
 export const projectTreeConst = [
   {
@@ -73,4 +73,18 @@ export const imageUrls = [
   'https://gama-laravel.s3.ap-southeast-1.amazonaws.com/snapshots/20_myDisplay2-52.png',
   'https://gama-laravel.s3.ap-southeast-1.amazonaws.com/snapshots/20_myDisplay2-6.png',
   'https://gama-laravel.s3.ap-southeast-1.amazonaws.com/snapshots/20_myDisplay2-8.png',
+];
+
+export const imgUrls = [
+  {
+    name: 'myDisplay',
+    urls: [
+      'https://gama-laravel.s3.ap-southeast-1.amazonaws.com/snapshots/myDisplay624c74620c65c-0.png',
+      'https://gama-laravel.s3.ap-southeast-1.amazonaws.com/snapshots/myDisplay624c74620c65c-10.png',
+      'https://gama-laravel.s3.ap-southeast-1.amazonaws.com/snapshots/myDisplay624c74620c65c-20.png',
+      'https://gama-laravel.s3.ap-southeast-1.amazonaws.com/snapshots/myDisplay624c74620c65c-30.png',
+      'https://gama-laravel.s3.ap-southeast-1.amazonaws.com/snapshots/myDisplay624c74620c65c-40.png',
+      'https://gama-laravel.s3.ap-southeast-1.amazonaws.com/snapshots/myDisplay624c74620c65c-50.png',
+    ],
+  },
 ];
