@@ -131,3 +131,14 @@ export const readList = (payload) => {
   };
   return axiosInstance.post('/api/file/list', payload, config);
 };
+
+export const downloadSimulation = (payload) => {
+  let config = {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+  };
+  return axiosInstance.post('/api/simulate/download', payload, config);
+};

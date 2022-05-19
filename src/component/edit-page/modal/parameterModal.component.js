@@ -10,6 +10,7 @@ export const ParameterModal = (props) => {
   const { isShow, onCancel, onSimulate, form, content } = props;
   useEffect(() => {
     form.resetFields();
+    var experiment = '';
     if (content.length > 0) {
       const parameterList = [];
       const outputList = [];
@@ -26,9 +27,14 @@ export const ParameterModal = (props) => {
           if (texts?.length > 1) {
             outputList.push({ name: texts[1] });
           }
+        } else if (line.indexOf('experiment') === 0) {
+          const texts = line?.split(' ');
+          if (texts?.length > 1) {
+            experiment = texts[1];
+          }
         }
       });
-      form.setFieldsValue({ parameterList, outputList });
+      form.setFieldsValue({ parameterList, outputList, experiment });
     }
     return () => console.log('close');
   }, [content]);

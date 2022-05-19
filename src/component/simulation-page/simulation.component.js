@@ -1,11 +1,23 @@
 import {
   CaretRightOutlined,
+  DownloadOutlined,
   FormOutlined,
+  ForwardOutlined,
   PauseOutlined,
   RedoOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { Avatar, Button, Col, Dropdown, Layout, Spin, Tabs } from 'antd';
+import {
+  Avatar,
+  Button,
+  Col,
+  Dropdown,
+  Input,
+  Layout,
+  Modal,
+  Spin,
+  Tabs,
+} from 'antd';
 import { Content, Header } from 'antd/lib/layout/layout';
 import HeaderComp from '../common/header.component';
 import './style.scss';
@@ -14,7 +26,7 @@ import { DEFAULT_COUNTER, imageUrls } from '../constant';
 import { getItem, useInterval } from '../../utils';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
-import { simulate } from '../../service/api';
+import { downloadSimulation, simulate } from '../../service/api';
 import addNotification, { NOTIFICATION_TYPE } from '../notification';
 import { useParams } from 'react-router-dom';
 
@@ -31,6 +43,16 @@ const Simulation = (props) => {
   const [maxStep, setMaxStep] = useState(0);
   const [counter, setCounter] = useState(DEFAULT_COUNTER);
   const [isFail, setFail] = useState(false);
+  const [isShow, setShow] = useState(false);
+  const [jump, setJump] = useState({ step: 1, isJumped: false });
+
+  useEffect(() => {
+    if (jump.isJumped) {
+      setStep(jump.step);
+      setJump({ ...jump, isJumped: false });
+      setShow(false);
+    }
+  }, [jump]);
 
   useEffect(() => {
     setLoading(true);
@@ -95,9 +117,52 @@ const Simulation = (props) => {
     }
     if (step >= maxStep) clearInterval();
   }, 1000);
-  const onChange = () => {};
+  const onChange = (activeKey) => {
+    setActiveKey(activeKey);
+  };
+  const handleDownload = () => {
+    const a = document.createElement('a');
+    downloadSimulation({ id, fps: 1 }).then((res) => {
+      const data = res?.data?.data || [];
+      data.map((url) => {
+        a.href = url;
+        a.download = url.split('/').pop();
+        document.body.appendChild(a);
+        a.click();
+      });
+    });
+    document.body.removeChild(a);
+  };
+  const onSubmit = () => {
+    setJump({ ...jump, isJumped: true });
+  };
   return (
     <>
+      <Modal
+        visible={isShow}
+        title="Jump step"
+        okText="Submit"
+        style={{ top: 100 }}
+        onCancel={() => setShow(false)}
+        onOk={onSubmit}
+        width={200}
+      >
+        <Input
+          type="number"
+          max={maxStep}
+          value={jump.step}
+          min={1}
+          step={1}
+          onChange={(e) => {
+            //remove . and -
+            [45, 46].includes(e.charCode) && e.preventDefault();
+            setJump({
+              ...jump,
+              step: e.target.value > maxStep ? maxStep : e.target.value,
+            });
+          }}
+        />
+      </Modal>
       <Layout style={{ height: '100vh' }}>
         <HeaderComp></HeaderComp>
         <Content style={{ padding: '0 0px' }}>
@@ -121,17 +186,24 @@ const Simulation = (props) => {
               )}
               {!isLoading && panes[0] && (
                 <div className="media_comp">
-                  <span className="step_text">Step: {step}</span>
+                  <span
+                    className="step_text"
+                    style={{ display: 'block', width: '60px' }}
+                  >
+                    Step: {step}{' '}
+                  </span>
                   <Button
                     shape="circle"
-                    icon={<PauseOutlined />}
-                    onClick={() => setPlay(false)}
+                    icon={play ? <PauseOutlined /> : <CaretRightOutlined />}
+                    onClick={() => setPlay(!play)}
                     style={{ marginRight: 5, marginLeft: 5 }}
                   />
                   <Button
                     shape="circle"
-                    icon={<CaretRightOutlined />}
-                    onClick={() => setPlay(true)}
+                    icon={<ForwardOutlined />}
+                    onClick={() => {
+                      setShow(true);
+                    }}
                     style={{ marginRight: 5 }}
                   />
                   <Button
@@ -142,6 +214,12 @@ const Simulation = (props) => {
                       setPlay(false);
                       setTimeout(() => setStep(1), 0);
                     }}
+                  />
+                  <Button
+                    shape="circle"
+                    icon={<DownloadOutlined />}
+                    style={{ marginRight: 5 }}
+                    onClick={handleDownload}
                   />
                   <Button
                     shape="circle"
@@ -179,7 +257,9 @@ const Simulation = (props) => {
                       >
                         <div className="main-content_1">
                           <img src={(imageUrl[pane.name] || [])[index]} />
-                          <div className="step">Step {index + 1}</div>
+                          <div className="step">
+                            Step {index + 1} / {maxStep}
+                          </div>
                         </div>
                       </div>
                     </Tabs.TabPane>
