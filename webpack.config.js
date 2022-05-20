@@ -49,7 +49,7 @@ module.exports = {
       '/api': 'http://localhost:8080',
     },
     compress: true,
-    allowedHosts: ['.fimo.edu.vn'],
+    allowedHosts: ['.asfsim.ml'],
   },
   mode: 'development',
   performance: {
