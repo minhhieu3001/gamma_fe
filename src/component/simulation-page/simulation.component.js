@@ -44,15 +44,9 @@ const Simulation = (props) => {
   const [counter, setCounter] = useState(DEFAULT_COUNTER);
   const [isFail, setFail] = useState(false);
   const [isShow, setShow] = useState(false);
-  const [jump, setJump] = useState({ step: 1, isJumped: false });
-
-  useEffect(() => {
-    if (jump.isJumped) {
-      setStep(jump.step);
-      setJump({ ...jump, isJumped: false });
-      setShow(false);
-    }
-  }, [jump]);
+  const [modal, setModal] = useState({ isOpen: false, type: '' });
+  const [fps, setFPS] = useState(1);
+  const [jump, setJump] = useState(2);
 
   useEffect(() => {
     setLoading(true);
@@ -69,7 +63,6 @@ const Simulation = (props) => {
     var max = 0;
     simulate(formData)
       .then((res) => {
-        console.log(res.data);
         const data = res?.data?.data || [];
         const paneList = data?.map((item, index) => ({
           id: index,
@@ -121,30 +114,32 @@ const Simulation = (props) => {
     setActiveKey(activeKey);
   };
   const handleDownload = () => {
-    const a = document.createElement('a');
-    downloadSimulation({ id, fps: 1 }).then((res) => {
-      const data = res?.data?.data || [];
-      data.map((url) => {
-        a.href = url;
-        a.download = url.split('/').pop();
-        document.body.appendChild(a);
-        a.click();
-      });
-    });
-    document.body.removeChild(a);
+    // const a = document.createElement('a');
+    // downloadSimulation({ id, fps: 1 }).then((res) => {
+    //   const data = res?.data?.data || [];
+    //   data.map((url) => {
+    //     a.href = url;
+    //     a.download = url.split('/').pop();
+    //     document.body.appendChild(a);
+    //     a.click();
+    //   });
+    // });
+    // document.body.removeChild(a);
+    setModal({ isOpen: false, type: '' });
   };
-  const onSubmit = () => {
-    setJump({ ...jump, isJumped: true });
+  const onJumpSubmit = () => {
+    setStep(jump, () => setJump(1));
+    setModal({ isOpen: false, type: '' });
   };
   return (
     <>
       <Modal
-        visible={isShow}
+        visible={modal.isOpen && modal.type === 'Jump'}
         title="Jump step"
         okText="Submit"
         style={{ top: 100 }}
-        onCancel={() => setShow(false)}
-        onOk={onSubmit}
+        onCancel={() => setModal({ isOpen: false, type: '' })}
+        onOk={onJumpSubmit}
         width={200}
       >
         <Input
@@ -156,10 +151,33 @@ const Simulation = (props) => {
           onChange={(e) => {
             //remove . and -
             [45, 46].includes(e.charCode) && e.preventDefault();
-            setJump({
-              ...jump,
-              step: e.target.value > maxStep ? maxStep : e.target.value,
-            });
+            setJump(
+              parseInt(e.target.value > maxStep ? maxStep : e.target.value),
+            );
+          }}
+        />
+      </Modal>
+      <Modal
+        visible={modal.isOpen && modal.type === 'Download'}
+        title="Enter FPS (Frame per second)"
+        okText="Submit"
+        style={{ top: 100 }}
+        onCancel={() => setModal({ isOpen: false, type: '' })}
+        onOk={handleDownload}
+        width={200}
+      >
+        <Input
+          type="number"
+          max={maxStep}
+          value={fps}
+          min={1}
+          step={1}
+          onChange={(e) => {
+            //remove . and -
+            [45, 46].includes(e.charCode) && e.preventDefault();
+            setFPS(
+              parseInt(e.target.value > maxStep ? maxStep : e.target.value),
+            );
           }}
         />
       </Modal>
@@ -202,7 +220,7 @@ const Simulation = (props) => {
                     shape="circle"
                     icon={<ForwardOutlined />}
                     onClick={() => {
-                      setShow(true);
+                      setModal({ isOpen: true, type: 'Jump' });
                     }}
                     style={{ marginRight: 5 }}
                   />
@@ -219,7 +237,7 @@ const Simulation = (props) => {
                     shape="circle"
                     icon={<DownloadOutlined />}
                     style={{ marginRight: 5 }}
-                    onClick={handleDownload}
+                    onClick={() => setModal({ isOpen: true, type: 'Download' })}
                   />
                   <Button
                     shape="circle"

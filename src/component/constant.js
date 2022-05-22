@@ -88,3 +88,5 @@ export const imgUrls = [
     ],
   },
 ];
+
+export const editableListExt = ['oms', 'herd', 'gaml'];

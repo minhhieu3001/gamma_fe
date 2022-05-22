@@ -40,7 +40,7 @@ export const ResetModal = (props) => {
           name="password"
           rules={[{ required: true, message: 'Please input your password!' }]}
         >
-          <Input placeholder="Input email..." type="password" />
+          <Input placeholder="Input password..." type="password" />
         </Form.Item>
         <Form.Item
           label="Confirm password"
@@ -49,7 +49,7 @@ export const ResetModal = (props) => {
             { required: true, message: 'Please input confirm password!' },
           ]}
         >
-          <Input placeholder="Input name..." type="password" />
+          <Input placeholder="Input confirm password..." type="password" />
         </Form.Item>
       </Form>
     </Modal>

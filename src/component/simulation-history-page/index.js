@@ -33,21 +33,17 @@ const SimulationHistory = (props) => {
   const [counter, setCounter] = useState(DEFAULT_COUNTER);
   const [isFail, setFail] = useState(false);
   const [isShow, setShow] = useState(false);
-  const [jump, setJump] = useState({ step: 1, isJumped: false });
+  const [modal, setModal] = useState({ isOpen: false, type: '' });
+  const [jump, setJump] = useState(1);
+  const [fps, setFPS] = useState(1);
+
+  useEffect(() => console.log(jump), [jump]);
 
   useEffect(() => {
     if (counter === 0) {
       history.push('/edit');
     }
   }, [counter]);
-
-  useEffect(() => {
-    if (jump.isJumped) {
-      setStep(jump.step);
-      setJump({ ...jump, isJumped: false });
-      setShow(false);
-    }
-  }, [jump]);
 
   useEffect(() => {
     const user = getItem('user');
@@ -109,45 +105,72 @@ const SimulationHistory = (props) => {
     setActiveKey(activeKey);
   };
   const handleDownload = () => {
-    const a = document.createElement('a');
-    downloadSimulation({ id, fps: 1 }).then((res) => {
-      const data = res?.data?.data || [];
-      data.map((url) => {
-        a.href = url;
-        a.download = url.split('/').pop();
-        document.body.appendChild(a);
-        a.click();
-      });
-    });
-    document.body.removeChild(a);
+    const url =
+      'https://gama-laravel.s3.ap-southeast-1.amazonaws.com/download/624c74620c65c/myChart.mp4';
+    let urlArray = url.split('/');
+    let bucket = urlArray[3];
+    let key = `${urlArray[4]}/${urlArray[5]}`;
+    // let s3 = new S3({ bucketName: bucket });
+    // s3.getObject(params, (err, data) => {
+    //   let blob = new Blob([data.Body], { type: data.ContentType });
+    //   let link = document.createElement('a');
+    //   link.href = window.URL.createObjectURL(blob);
+    //   link.download = url;
+    //   link.click();
+    //   document.body.removeChild(link);
+    // });
   };
-  const onSubmit = () => {
-    setJump({ ...jump, isJumped: true });
+  const onJumpSubmit = () => {
+    setStep(jump, () => setJump(1));
+    setModal({ isOpen: false, type: '' });
   };
   return (
     <>
       <Modal
-        visible={isShow}
+        visible={modal.isOpen && modal.type === 'Jump'}
         title="Jump step"
         okText="Submit"
         style={{ top: 100 }}
         onCancel={() => setShow(false)}
-        onOk={onSubmit}
+        onOk={onJumpSubmit}
         width={200}
       >
         <Input
           type="number"
           max={maxStep}
-          value={jump.step}
+          value={jump}
           min={1}
           step={1}
           onChange={(e) => {
             //remove . and -
             [45, 46].includes(e.charCode) && e.preventDefault();
-            setJump({
-              ...jump,
-              step: e.target.value > maxStep ? maxStep : e.target.value,
-            });
+            setJump(
+              parseInt(e.target.value > maxStep ? maxStep : e.target.value),
+            );
+          }}
+        />
+      </Modal>
+      <Modal
+        visible={modal.isOpen && modal.type === 'Download'}
+        title="Enter FPS (frame per second)"
+        okText="Submit"
+        style={{ top: 100 }}
+        onCancel={() => setShow(false)}
+        onOk={handleDownload}
+        width={200}
+      >
+        <Input
+          type="number"
+          max={maxStep}
+          value={fps}
+          min={1}
+          step={1}
+          onChange={(e) => {
+            //remove . and -
+            [45, 46].includes(e.charCode) && e.preventDefault();
+            setFPS(
+              parseInt(e.target.value > maxStep ? maxStep : e.target.value),
+            );
           }}
         />
       </Modal>
@@ -191,7 +214,7 @@ const SimulationHistory = (props) => {
                     icon={<ForwardOutlined />}
                     style={{ marginRight: 5 }}
                     onClick={() => {
-                      setShow(true);
+                      setModal({ isOpen: true, type: 'Jump' });
                     }}
                   />
                   <Button
@@ -207,7 +230,7 @@ const SimulationHistory = (props) => {
                     shape="circle"
                     icon={<DownloadOutlined />}
                     style={{ marginRight: 5 }}
-                    onClick={handleDownload}
+                    onClick={() => setModal({ isOpen: true, type: 'Download' })}
                   />
                   <Button
                     shape="circle"
