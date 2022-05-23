@@ -114,18 +114,32 @@ const Simulation = (props) => {
     setActiveKey(activeKey);
   };
   const handleDownload = () => {
-    // const a = document.createElement('a');
-    // downloadSimulation({ id, fps: 1 }).then((res) => {
-    //   const data = res?.data?.data || [];
-    //   data.map((url) => {
-    //     a.href = url;
-    //     a.download = url.split('/').pop();
-    //     document.body.appendChild(a);
-    //     a.click();
-    //   });
-    // });
-    // document.body.removeChild(a);
-    setModal({ isOpen: false, type: '' });
+    setLoading(true);
+    downloadSimulation({ id, fps })
+      .then((res) => {
+        const a = window.document.createElement('a');
+        const url = window.URL.createObjectURL(res.data);
+        a.style.display = 'none';
+        a.href = url;
+        a.download = id + '_simulation.zip';
+        window.URL.revokeObjectURL(url);
+        a.click();
+        a.remove();
+      })
+      .catch((err) => {
+        if (err.response)
+          addNotification(
+            err.response.data.message || 'Something wrong!',
+            NOTIFICATION_TYPE.ERROR,
+          );
+        else
+          addNotification(err || 'Something wrong!', NOTIFICATION_TYPE.ERROR);
+        setFail(true);
+      })
+      .finally(() => {
+        setLoading(false);
+        setModal({ isOpen: false, type: '' });
+      });
   };
   const onJumpSubmit = () => {
     setStep(jump, () => setJump(1));

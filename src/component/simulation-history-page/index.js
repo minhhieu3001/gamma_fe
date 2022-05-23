@@ -105,20 +105,32 @@ const SimulationHistory = (props) => {
     setActiveKey(activeKey);
   };
   const handleDownload = () => {
-    const url =
-      'https://gama-laravel.s3.ap-southeast-1.amazonaws.com/download/624c74620c65c/myChart.mp4';
-    let urlArray = url.split('/');
-    let bucket = urlArray[3];
-    let key = `${urlArray[4]}/${urlArray[5]}`;
-    // let s3 = new S3({ bucketName: bucket });
-    // s3.getObject(params, (err, data) => {
-    //   let blob = new Blob([data.Body], { type: data.ContentType });
-    //   let link = document.createElement('a');
-    //   link.href = window.URL.createObjectURL(blob);
-    //   link.download = url;
-    //   link.click();
-    //   document.body.removeChild(link);
-    // });
+    setLoading(true);
+    downloadSimulation({ id, fps })
+      .then((res) => {
+        const a = window.document.createElement('a');
+        const url = window.URL.createObjectURL(res.data);
+        a.style.display = 'none';
+        a.href = url;
+        a.download = id + '_simulation.zip';
+        window.URL.revokeObjectURL(url);
+        a.click();
+        a.remove();
+      })
+      .catch((err) => {
+        if (err.response)
+          addNotification(
+            err.response.data.message || 'Something wrong!',
+            NOTIFICATION_TYPE.ERROR,
+          );
+        else
+          addNotification(err || 'Something wrong!', NOTIFICATION_TYPE.ERROR);
+        setFail(true);
+      })
+      .finally(() => {
+        setLoading(false);
+        setModal({ isOpen: false, type: '' });
+      });
   };
   const onJumpSubmit = () => {
     setStep(jump, () => setJump(1));
@@ -131,7 +143,7 @@ const SimulationHistory = (props) => {
         title="Jump step"
         okText="Submit"
         style={{ top: 100 }}
-        onCancel={() => setShow(false)}
+        onCancel={() => setModal({ isOpen: false, type: '' })}
         onOk={onJumpSubmit}
         width={200}
       >
@@ -155,7 +167,7 @@ const SimulationHistory = (props) => {
         title="Enter FPS (frame per second)"
         okText="Submit"
         style={{ top: 100 }}
-        onCancel={() => setShow(false)}
+        onCancel={() => setModal({ isOpen: false, type: '' })}
         onOk={handleDownload}
         width={200}
       >
