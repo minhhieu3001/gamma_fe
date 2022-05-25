@@ -137,7 +137,8 @@ export const downloadSimulation = (payload) => {
     headers: {
       Authorization: 'Bearer ' + localStorage.getItem('token'),
       'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-      'X-Requested-With': 'XMLHttpRequest',
+      'Content-disposition': 'attachment',
+      Accept: 'application/octet-stream',
     },
   };
   return axiosInstance.post('/api/simulate/download', payload, config);

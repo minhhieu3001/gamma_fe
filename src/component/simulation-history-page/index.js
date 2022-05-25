@@ -106,14 +106,17 @@ const SimulationHistory = (props) => {
   };
   const handleDownload = () => {
     setLoading(true);
+    setModal({ isOpen: false, type: '' });
     downloadSimulation({ id, fps })
       .then((res) => {
+        console.log(res);
         const a = window.document.createElement('a');
-        const url = window.URL.createObjectURL(res.data);
+        const url = window.URL.createObjectURL(
+          new Blob([res.data], { type: 'application/octet-stream' }),
+        );
         a.style.display = 'none';
         a.href = url;
-        a.download = id + '_simulation.zip';
-        window.URL.revokeObjectURL(url);
+        a.download = id + '.zip';
         a.click();
         a.remove();
       })
@@ -129,7 +132,6 @@ const SimulationHistory = (props) => {
       })
       .finally(() => {
         setLoading(false);
-        setModal({ isOpen: false, type: '' });
       });
   };
   const onJumpSubmit = () => {
@@ -145,7 +147,7 @@ const SimulationHistory = (props) => {
         style={{ top: 100 }}
         onCancel={() => setModal({ isOpen: false, type: '' })}
         onOk={onJumpSubmit}
-        width={200}
+        width={300}
       >
         <Input
           type="number"
@@ -169,7 +171,7 @@ const SimulationHistory = (props) => {
         style={{ top: 100 }}
         onCancel={() => setModal({ isOpen: false, type: '' })}
         onOk={handleDownload}
-        width={200}
+        width={300}
       >
         <Input
           type="number"
