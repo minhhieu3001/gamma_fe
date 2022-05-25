@@ -128,7 +128,6 @@ const SimulationHistory = (props) => {
           );
         else
           addNotification(err || 'Something wrong!', NOTIFICATION_TYPE.ERROR);
-        setFail(true);
       })
       .finally(() => {
         setLoading(false);

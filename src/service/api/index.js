@@ -3,6 +3,7 @@ import * as axios from 'axios';
 const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_HOST,
   headers: {
+    Authorization: 'Bearer ' + localStorage.getItem('token'),
     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
     'X-Requested-With': 'XMLHttpRequest',
   },
@@ -133,13 +134,16 @@ export const readList = (payload) => {
 };
 
 export const downloadSimulation = (payload) => {
+  const { fps, id } = payload;
   let config = {
     headers: {
       Authorization: 'Bearer ' + localStorage.getItem('token'),
       'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+      'X-Requested-With': 'XMLHttpRequest',
       'Content-disposition': 'attachment',
-      Accept: 'application/octet-stream',
+      'Content-Type': 'application/zip',
+      Accept: 'application/zip',
     },
   };
-  return axiosInstance.post('/api/simulate/download', payload, config);
+  return axiosInstance.get(`/api/simulate/download/${id}?fps=${fps}`, config);
 };
