@@ -115,14 +115,14 @@ const Simulation = (props) => {
   };
   const handleDownload = () => {
     setLoading(true);
+    setModal({ isOpen: false, type: '' });
     downloadSimulation({ id, fps })
       .then((res) => {
         const a = window.document.createElement('a');
         const url = window.URL.createObjectURL(res.data);
         a.style.display = 'none';
         a.href = url;
-        a.download = id + '_simulation.zip';
-        window.URL.revokeObjectURL(url);
+        a.download = id + '.zip';
         a.click();
         a.remove();
       })
@@ -138,7 +138,6 @@ const Simulation = (props) => {
       })
       .finally(() => {
         setLoading(false);
-        setModal({ isOpen: false, type: '' });
       });
   };
   const onJumpSubmit = () => {

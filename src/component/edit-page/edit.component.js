@@ -29,7 +29,7 @@ import { Tabs, Button } from 'antd';
 import { useEffect, useState, useRef } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import './style.scss';
-import { dataSource, projectTreeConst } from '../constant';
+import { dataSource, editableListExt } from '../constant';
 import { EditableCell, EditableRow } from './editablecell';
 import { CreateProjectModal } from './modal/createProject.component';
 import { DeleteProjectModal } from './modal/delete.component';
@@ -381,7 +381,6 @@ const Edit = (props) => {
 
   const handleOpenParameter = (id, content) => {
     setCurrentContent(content);
-    console.log(id);
     setModal({
       isOpen: true,
       type: 'PARAMETER',
@@ -487,7 +486,7 @@ const Edit = (props) => {
                 >
                   <Row>
                     <Col>
-                      <Search
+                      <Input
                         placeholder="input search text"
                         allowClear
                         onSearch={onSearch}
@@ -682,6 +681,9 @@ const Edit = (props) => {
                           <CodeMirror
                             value={pane.content || ''}
                             height="80vh"
+                            editable={editableListExt.includes(
+                              pane.name.split('.').pop(),
+                            )}
                             onChange={(value, viewUpdate) => {
                               const isChange =
                                 !pane.isOpen && !isEqual(value, pane.content);

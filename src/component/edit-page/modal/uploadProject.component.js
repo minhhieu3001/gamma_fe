@@ -105,9 +105,7 @@ export const UploadProjectModal = (props) => {
             beforeUpload={(file) => {
               const reader = new FileReader();
 
-              reader.onload = (e) => {
-                console.log(e.target.result);
-              };
+              reader.onload = (e) => {};
               reader.readAsText(file);
               setFile(file);
 

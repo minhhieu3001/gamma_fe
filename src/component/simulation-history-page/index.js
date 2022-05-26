@@ -37,8 +37,6 @@ const SimulationHistory = (props) => {
   const [jump, setJump] = useState(1);
   const [fps, setFPS] = useState(1);
 
-  useEffect(() => console.log(jump), [jump]);
-
   useEffect(() => {
     if (counter === 0) {
       history.push('/edit');
@@ -109,11 +107,8 @@ const SimulationHistory = (props) => {
     setModal({ isOpen: false, type: '' });
     downloadSimulation({ id, fps })
       .then((res) => {
-        console.log(res);
         const a = window.document.createElement('a');
-        const url = window.URL.createObjectURL(
-          new Blob([res.data], { type: 'application/octet-stream' }),
-        );
+        const url = window.URL.createObjectURL(res.data);
         a.style.display = 'none';
         a.href = url;
         a.download = id + '.zip';

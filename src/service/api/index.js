@@ -140,10 +140,8 @@ export const downloadSimulation = (payload) => {
       Authorization: 'Bearer ' + localStorage.getItem('token'),
       'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
       'X-Requested-With': 'XMLHttpRequest',
-      'Content-disposition': 'attachment',
-      'Content-Type': 'application/zip',
-      Accept: 'application/zip',
     },
+    responseType: 'blob',
   };
   return axiosInstance.get(`/api/simulate/download/${id}?fps=${fps}`, config);
 };
