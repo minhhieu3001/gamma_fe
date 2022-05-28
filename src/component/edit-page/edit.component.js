@@ -476,6 +476,7 @@ const Edit = (props) => {
                   mode="inline"
                   defaultSelectedKeys={['1']}
                   defaultOpenKeys={['sub1']}
+                  className={'scroll-bar'}
                   style={{
                     height: '100%',
                     maxHeight: '100vh',
@@ -486,7 +487,7 @@ const Edit = (props) => {
                 >
                   <Row>
                     <Col>
-                      <Input
+                      <Search
                         placeholder="input search text"
                         allowClear
                         onSearch={onSearch}
@@ -578,7 +579,7 @@ const Edit = (props) => {
               </Sider>
             </Col>
 
-            <Content style={{ padding: '0 24px 0 100px', minHeight: 280 }}>
+            <Content style={{ padding: '0 20px 0 100px', minHeight: 280 }}>
               <Tabs
                 hideAdd
                 onChange={onChange}
@@ -594,7 +595,7 @@ const Edit = (props) => {
                   >
                     <div
                       style={{
-                        height: '80vh',
+                        height: '85vh',
                         width: '80vw',
                         backgroundColor: '#fff',
                       }}
