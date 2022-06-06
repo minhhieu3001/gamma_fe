@@ -90,3 +90,16 @@ export const imgUrls = [
 ];
 
 export const editableListExt = ['oms', 'herd', 'gaml'];
+
+export const typeOptions = [
+  {
+    text: 'model',
+    value: 'models',
+  },
+  {
+    text: 'include',
+    value: 'includes',
+  },
+];
+
+export const allowImgExts = ['bmp', 'gif', 'png', 'ief', 'jpeg'];

@@ -18,130 +18,58 @@ export const login = (params) => {
 };
 
 export const list = (params) => {
-  let config = {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('token'),
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-      'X-Requested-With': 'XMLHttpRequest',
-    },
-  };
-  return axiosInstance.post('/api/project/list', params, config);
+  return axiosInstance.post('/api/project/list', params);
 };
 
 export const upload = (payload) => {
-  let config = {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('token'),
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-      'X-Requested-With': 'XMLHttpRequest',
-      'Content-Type': 'multipart/form-data',
-    },
-  };
-  return axiosInstance.post('/api/upload', payload, config);
+  return axiosInstance.post('/api/upload', payload);
 };
 
 export const update = (payload) => {
-  let config = {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('token'),
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-      'X-Requested-With': 'XMLHttpRequest',
-      'Content-Type': 'multipart/form-data',
-    },
-  };
-  return axiosInstance.post('/api/file/update', payload, config);
+  return axiosInstance.post('/api/file/update', payload);
 };
 
-export const getFile = (payload) => {
-  let config = {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('token'),
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-      'X-Requested-With': 'XMLHttpRequest',
-    },
-  };
-  return axiosInstance.post('/api/file/read', payload, config);
+export const getFile = (payload, responseType = '') => {
+  return axiosInstance.post('/api/file/read', payload, {
+    responseType,
+  });
 };
 
 export const deletePj = (payload) => {
-  let config = {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('token'),
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-      'X-Requested-With': 'XMLHttpRequest',
-    },
-  };
-  return axiosInstance.post('/api/project/delete', payload, config);
+  return axiosInstance.post('/api/project/delete', payload);
 };
 
 export const getUser = (id) => {
-  let config = {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('token'),
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-      'X-Requested-With': 'XMLHttpRequest',
-    },
-  };
-  return axiosInstance.get(`/api/user/${id}`, config);
+  return axiosInstance.get(`/api/user/${id}`);
 };
 
 export const updateUser = (id, payload) => {
-  let config = {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('token'),
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-      'X-Requested-With': 'XMLHttpRequest',
-    },
-  };
-  return axiosInstance.post(`/api/user/update/${id}`, payload, config);
+  return axiosInstance.post(`/api/user/update/${id}`, payload);
 };
 
 export const createPj = (params) => {
-  let config = {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('token'),
-    },
-  };
-  return axiosInstance.post('/api/project', params, config);
+  return axiosInstance.post('/api/project', params);
 };
 
 export const simulate = (params) => {
-  let config = {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('token'),
-    },
-  };
-  return axiosInstance.post('/api/simulate', params, config);
+  return axiosInstance.post('/api/simulate', params);
 };
 export const simulateLastest = (id) => {
-  let config = {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('token'),
-    },
-  };
-  return axiosInstance.get(`/api/simulate/latest/${id}`, config);
+  return axiosInstance.get(`/api/simulate/latest/${id}`);
 };
 
 export const readList = (payload) => {
-  let config = {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('token'),
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-      'X-Requested-With': 'XMLHttpRequest',
-    },
-  };
-  return axiosInstance.post('/api/file/list', payload, config);
+  return axiosInstance.post('/api/file/list', payload);
 };
 
 export const downloadSimulation = (payload) => {
   const { fps, id } = payload;
   let config = {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('token'),
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-      'X-Requested-With': 'XMLHttpRequest',
-    },
     responseType: 'blob',
   };
   return axiosInstance.get(`/api/simulate/download/${id}?fps=${fps}`, config);
+};
+
+export const uploadFile = (payload) => {
+  return axiosInstance.post('/api/file/create', payload);
 };

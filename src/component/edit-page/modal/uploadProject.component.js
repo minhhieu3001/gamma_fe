@@ -1,50 +1,17 @@
-import { Form, Select, Modal, Upload, Button } from 'antd';
-import { useForm } from 'antd/lib/form/Form';
-import { UploadOutlined } from '@ant-design/icons';
+import { Modal, Col } from 'antd';
 import { useState } from 'react';
-
-const { Option } = Select;
+import { UploadInput } from '../../common/UploadInput';
+import addNotification, { NOTIFICATION_TYPE } from '../../notification';
 
 export const UploadProjectModal = (props) => {
-  const { isShow, onCancel, onUpload, data } = props;
-  const [form] = useForm();
-  const [fileList, setFileList] = useState([]);
+  const { isShow, onCancel, onUpload } = props;
   const [file, setFile] = useState();
-  const folderData = [
-    {
-      name: 'models',
-      value: 0,
-    },
-    {
-      name: 'includes',
-      value: 1,
-    },
-  ];
+
   const onSubmit = () => {
-    form.validateFields().then((data) => {
-      onUpload(data, file);
-    });
+    if (!file) addNotification('Empty project!', NOTIFICATION_TYPE.ERROR);
+    else onUpload(file);
   };
 
-  const uploadFile = (info) => {
-    let fileList = [...info.fileList];
-    const list = fileList.filter(
-      (item) => item.type === 'application/x-zip-compressed',
-    );
-    setFileList(list);
-  };
-
-  const customUpload = (options) => {
-    const { file, onSuccess } = options;
-    onSuccess('Ok');
-  };
-
-  const getFile = (e) => {
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e && e.fileList;
-  };
   return (
     <Modal
       visible={isShow}
@@ -53,76 +20,14 @@ export const UploadProjectModal = (props) => {
       onCancel={onCancel}
       onOk={onSubmit}
     >
-      <Form
-        form={form}
-        layout="horizontal"
-        labelCol={{ span: 5 }}
-        wrapperCol={{ span: 10 }}
-      >
-        {/* <Form.Item
-          label="Project"
-          name="projectId"
-          rules={[
-            {
-              required: true,
-              message: 'You have to select project!',
-            },
-          ]}
-        >
-          <Select>
-            {data.map((item) => (
-              <Option key={item.id} value={item.id}>
-                {item.name}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item> */}
-        {/* <Form.Item
-          label="Folder"
-          name="folder"
-          initialValue={folderData[0].value}
-        >
-          <Select>
-            {folderData.map((item) => (
-              <Option key={item.value} value={item.value}>
-                {item.name}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item> */}
-        <Form.Item
-          label="Upload Project"
-          name="file"
-          getValueFromEvent={getFile}
-        >
-          <Upload
-            multiple={false}
-            maxCount={1}
-            onChange={uploadFile}
-            accept=".zip"
-            fileList={fileList}
-            customRequest={customUpload}
-            beforeUpload={(file) => {
-              const reader = new FileReader();
-
-              reader.onload = (e) => {};
-              reader.readAsText(file);
-              setFile(file);
-
-              // Prevent upload
-              return false;
-            }}
-          >
-            <Button icon={<UploadOutlined />}>Upload</Button>
-          </Upload>
-          <div className="">
-            * Only accept zip file containing{' '}
-            <span style={{ fontStyle: 'italic' }}>project folder</span>, which
-            includes <span style={{ fontStyle: 'italic' }}>models</span> and{' '}
-            <span style={{ fontStyle: 'italic' }}>includes</span> folder
-          </div>
-        </Form.Item>
-      </Form>
+      <Col span={12} offset={6}>
+        <UploadInput
+          title={'Choose Zip File'}
+          style={{ width: '100%' }}
+          allowExts={['zip']}
+          handleSubmitFile={(file) => setFile(file)}
+        />
+      </Col>
     </Modal>
   );
 };

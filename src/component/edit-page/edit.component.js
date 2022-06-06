@@ -1,37 +1,22 @@
+import { Layout, Menu, Col, Table, Input, Tooltip, Row, Form } from 'antd';
 import {
-  Layout,
-  Menu,
-  Dropdown,
-  Avatar,
-  Col,
-  Table,
-  Input,
-  Divider,
-  Tooltip,
-  Row,
-  Spin,
-  Form,
-} from 'antd';
-import {
-  UserOutlined,
   ProfileOutlined,
   FolderOpenOutlined,
   FileTextOutlined,
   CaretRightOutlined,
   SaveOutlined,
-  LogoutOutlined,
-  FolderAddOutlined,
   CloudUploadOutlined,
   DeleteOutlined,
+  FileAddOutlined,
 } from '@ant-design/icons';
-import { uniqueId, isEqual, cloneDeep } from 'lodash';
+import { isEqual, cloneDeep } from 'lodash';
 import { Tabs, Button } from 'antd';
 import { useEffect, useState, useRef } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import './style.scss';
-import { dataSource, editableListExt } from '../constant';
+import { allowImgExts, dataSource, editableListExt } from '../constant';
 import { EditableCell, EditableRow } from './editablecell';
-import { CreateProjectModal } from './modal/createProject.component';
+import { UploadFileModal } from './modal/uploadFile.component';
 import { DeleteProjectModal } from './modal/delete.component';
 import { UploadProjectModal } from './modal/uploadProject.component';
 import { XMLGenerator } from '../common/XML-generator';
@@ -46,6 +31,7 @@ import {
   list,
   update,
   upload,
+  uploadFile,
 } from '../../service/api';
 import addNotification, { NOTIFICATION_TYPE } from '../notification';
 import { connect } from 'react-redux';
@@ -182,10 +168,26 @@ const Edit = (props) => {
         addProject.includes.find((include) => include.id === targetKey) ||
         addProject.models.find((model) => model.id === targetKey);
       const path = filePathList.find((file) => file.id === targetKey);
-      getFile({ path: path.path, user_id: user.id })
+      const isImage = allowImgExts.includes(file.filename.split('.').pop());
+      getFile({ path: path.path, user_id: user.id }, isImage ? 'blob' : '')
         .then((res) => {
-          const content = res.data.file.original || '';
-          if (path.path.includes('.csv')) {
+          var content = res.data || '';
+          if (isImage) {
+            const imageBlob = res.data;
+            content = window.URL.createObjectURL(imageBlob);
+            setPanes([
+              ...panes,
+              {
+                name: file.filename,
+                id: targetKey,
+                content: content,
+                isUpdate: false,
+                isOpen: true,
+                tempContent: content,
+                type: 'image',
+              },
+            ]);
+          } else if (path.path.includes('.csv')) {
             const rows = content.split('\r\n');
             const columns = rows[0].split(',').map((txt) => ({
               title: txt,
@@ -262,7 +264,7 @@ const Edit = (props) => {
           setActiveKey(targetKey);
           setLoading(false);
         });
-    }
+    } else setActiveKey(id);
   };
 
   const handleCloseModal = () => {
@@ -270,13 +272,6 @@ const Edit = (props) => {
   };
 
   const handleCreateProject = (name) => {
-    // const newProject = {
-    //   id: uniqueId(),
-    //   name,
-    //   includes: [],
-    //   models: [],
-    // };
-    // setProjectTree((data) => [...data, newProject]);
     const user = getItem('user');
     createPj({ user_id: user.id, name })
       .then((res) => {
@@ -309,7 +304,8 @@ const Edit = (props) => {
     handleCloseModal();
   };
 
-  const handleUploadProject = (data, file) => {
+  const handleUploadProject = (file) => {
+    handleCloseModal();
     setLoading(true);
     var formData = new FormData();
     formData.append('user_id', user.id);
@@ -325,10 +321,14 @@ const Edit = (props) => {
           })
           .finally(() => setLoading(false));
         addNotification('Upload file successfully', NOTIFICATION_TYPE.SUCCESS);
-        handleCloseModal();
       })
       .catch((err) => {
         addNotification(err?.response?.data?.message, NOTIFICATION_TYPE.ERROR);
+        setModal({
+          type: 'UPLOAD_PROJECT',
+          isOpen: true,
+          id: null,
+        });
         setLoading(false);
       });
   };
@@ -388,6 +388,32 @@ const Edit = (props) => {
     });
   };
 
+  const handleUploadFile = (data, file) => {
+    handleCloseModal();
+    setLoading(true);
+    console.log(file);
+    var formData = new FormData();
+    formData.append('user_id', user.id);
+    formData.append('file', file);
+    formData.append('type', data.type);
+    formData.append('project_id', data.projectId);
+    formData.append('path', file.name);
+    uploadFile(formData)
+      .then((res) => {
+        refreshData(user.id);
+        addNotification('Upload file successfully', NOTIFICATION_TYPE.SUCCESS);
+      })
+      .catch((err) => {
+        addNotification(err?.response?.data?.message, NOTIFICATION_TYPE.ERROR);
+        setModal({
+          type: 'UPLOAD_FILE',
+          isOpen: true,
+          id: null,
+        });
+        setLoading(false);
+      });
+  };
+
   const handleSaveFile = (pane) => {
     const paneTemp = panes.map((item) =>
       item.id === pane.id
@@ -433,13 +459,13 @@ const Edit = (props) => {
     <>
       <Layout style={{ height: '100vh' }}>
         {modal.type === 'CREATE' && modal.isOpen && (
-          <CreateProjectModal
+          <UploadFileModal
             isShow={modal.isOpen}
             onCancel={() => setModal({ type: null, isOpen: false, id: null })}
             onCreate={handleCreateProject}
           />
         )}
-        {modal.type === 'UPLOAD' && modal.isOpen && (
+        {modal.type === 'UPLOAD_PROJECT' && modal.isOpen && (
           <UploadProjectModal
             isShow={modal.isOpen}
             onCancel={() => setModal({ type: null, isOpen: false, id: null })}
@@ -452,6 +478,14 @@ const Edit = (props) => {
             isShow={modal.isOpen}
             onCancel={() => setModal({ type: null, isOpen: false, id: null })}
             onDelete={handleDeleteProject}
+            data={projectTree}
+          />
+        )}
+        {modal.type === 'UPLOAD_FILE' && modal.isOpen && (
+          <UploadFileModal
+            isShow={modal.isOpen}
+            onCancel={() => setModal({ type: null, isOpen: false, id: null })}
+            onUploadFile={handleUploadFile}
             data={projectTree}
           />
         )}
@@ -491,20 +525,10 @@ const Edit = (props) => {
                         placeholder="input search text"
                         allowClear
                         onSearch={onSearch}
-                        style={{ width: 210 }}
+                        style={{ width: 190 }}
                       />
                     </Col>
                     <Col>
-                      {/* <Tooltip title="Create new project">
-                        <Button
-                          type="text"
-                          shape="circle"
-                          icon={<FolderAddOutlined />}
-                          onClick={() =>
-                            setModal({ type: 'CREATE', isOpen: true, id: null })
-                          }
-                        />
-                      </Tooltip> */}
                       <Tooltip title="Upload Project">
                         <Button
                           type="text"
@@ -512,7 +536,21 @@ const Edit = (props) => {
                           icon={<CloudUploadOutlined />}
                           onClick={() =>
                             setModal({
-                              type: 'UPLOAD',
+                              type: 'UPLOAD_PROJECT',
+                              isOpen: true,
+                              id: null,
+                            })
+                          }
+                        />
+                      </Tooltip>
+                      <Tooltip title="Upload File">
+                        <Button
+                          type="text"
+                          shape="circle"
+                          icon={<FileAddOutlined />}
+                          onClick={() =>
+                            setModal({
+                              type: 'UPLOAD_FILE',
                               isOpen: true,
                               id: null,
                             })
@@ -678,6 +716,16 @@ const Edit = (props) => {
                               editable={false}
                             />
                           )
+                        ) : pane.type === 'image' ? (
+                          <div
+                            className="image-container"
+                            style={{
+                              height: '100%',
+                              display: 'flex',
+                            }}
+                          >
+                            <img src={pane.content} alt={pane.name} />
+                          </div>
                         ) : (
                           <CodeMirror
                             value={pane.content || ''}
