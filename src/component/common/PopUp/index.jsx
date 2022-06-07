@@ -5,7 +5,7 @@ import './style.scss';
 export const Popup = ({ visible, x, y, handleClick }) =>
   visible && (
     <>
-      <ul className="popup" style={{ left: `${x}px`, top: `${y + 20}px` }}>
+      <ul className="popup" style={{ left: `${x}px`, top: `${y}px` }}>
         <li onClick={handleClick}>
           <DeleteOutlined />
           &nbsp; Delete
