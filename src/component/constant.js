@@ -102,4 +102,4 @@ export const typeOptions = [
   },
 ];
 
-export const allowImgExts = ['bmp', 'gif', 'png', 'ief', 'jpeg'];
+export const allowImgExts = ['bmp', 'gif', 'png', 'ief', 'jpeg', 'jpg'];
