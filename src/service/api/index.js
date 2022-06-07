@@ -73,3 +73,7 @@ export const downloadSimulation = (payload) => {
 export const uploadFile = (payload) => {
   return axiosInstance.post('/api/file/create', payload);
 };
+
+export const deleteFile = (id) => {
+  return axiosInstance.delete(`/api/file/${id}`);
+};

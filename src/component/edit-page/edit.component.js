@@ -14,7 +14,7 @@ import { Tabs, Button } from 'antd';
 import { useEffect, useState, useRef } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import './style.scss';
-import { allowImgExts, dataSource, editableListExt } from '../constant';
+import { allowImgExts, editableListExt } from '../constant';
 import { EditableCell, EditableRow } from './editablecell';
 import { UploadFileModal } from './modal/uploadFile.component';
 import { DeleteProjectModal } from './modal/delete.component';
@@ -26,6 +26,7 @@ import HeaderComp from '../common/header.component';
 import { getItem, setItem, transformTree } from '../../utils';
 import {
   createPj,
+  deleteFile,
   deletePj,
   getFile,
   list,
@@ -35,48 +36,20 @@ import {
 } from '../../service/api';
 import addNotification, { NOTIFICATION_TYPE } from '../notification';
 import { connect } from 'react-redux';
+import Popup from '../common/PopUp';
+import { ConfirmModal } from '../common/ConfirmModal';
 
 const { TabPane } = Tabs;
 const { SubMenu } = Menu;
 const { Search } = Input;
-const { Header, Content, Footer, Sider } = Layout;
-
-const columns = [
-  {
-    title: '#',
-    width: 60,
-    render: (param, row, index) => index + 1,
-  },
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-    width: 100,
-    editable: true,
-  },
-  {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
-    width: 100,
-    editable: true,
-  },
-  {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
-    width: 100,
-    editable: true,
-  },
-];
+const { Content, Sider } = Layout;
 
 const Edit = (props) => {
-  const { setInputXMl, isLoading, setLoading } = props;
+  const { setInputXMl, setLoading } = props;
   const [panes, setPanes] = useState([]);
   const [activeKey, setActiveKey] = useState();
   const [projectTree, setProjectTree] = useState([]);
   const [filePathList, setFilePathList] = useState([]);
-  const [dataColumn, setDataColumn] = useState([]);
   const [modal, setModal] = useState({ type: null, isOpen: false, id: null });
   const [user, setUser] = useState();
   const [form] = Form.useForm();
@@ -84,6 +57,15 @@ const Edit = (props) => {
   const history = useHistory();
   const paneRef = useRef();
   const pathRef = useRef();
+  const [popup, setPopup] = useState({ visible: false, x: 0, y: 0 });
+  const [confirmModal, setConfirmModal] = useState({
+    visible: false,
+    title: '',
+    text: '',
+    onCancel: () => {},
+    onSubmit: () => {},
+    id: null,
+  });
 
   const onSearch = (data) => {
     refreshData(user.id, data);
@@ -122,7 +104,6 @@ const Edit = (props) => {
   };
 
   useEffect(() => {
-    setDataColumn(dataSource);
     localStorage.removeItem('tabs');
     const tempUser = getItem('user');
     if (!tempUser) history.push('/');
@@ -391,7 +372,6 @@ const Edit = (props) => {
   const handleUploadFile = (data, file) => {
     handleCloseModal();
     setLoading(true);
-    console.log(file);
     var formData = new FormData();
     formData.append('user_id', user.id);
     formData.append('file', file);
@@ -455,9 +435,58 @@ const Edit = (props) => {
       })
       .catch((err) => console.log(err));
   };
+
+  const handleRightClickFile = (e, id) => {
+    e.preventDefault();
+    setPopup({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      handleClick: () => {
+        setConfirmModal({
+          visible: true,
+          title: 'Delete',
+          text: 'Do you want to delete this file?',
+          onCancel: closeConfirmModal,
+          onSubmit: () => handleDeleteFile(id),
+        });
+      },
+    });
+  };
+
+  const closeConfirmModal = () => {
+    setPopup({ visible: false, x: 0, y: 0 });
+    setConfirmModal({
+      visible: false,
+      title: '',
+      text: '',
+      onCancel: () => {},
+      onSubmit: () => {},
+      id: null,
+    });
+  };
+
+  const handleDeleteFile = (id) => {
+    closeConfirmModal();
+    setLoading(true);
+    onRemoveTab(id);
+    deleteFile(id)
+      .then((res) => {
+        refreshData(user.id);
+        addNotification('Delete file successfully', NOTIFICATION_TYPE.SUCCESS);
+      })
+      .catch((err) =>
+        addNotification(err?.response?.data?.message, NOTIFICATION_TYPE.ERROR),
+      );
+  };
   return (
     <>
-      <Layout style={{ height: '100vh' }}>
+      <Layout
+        style={{ height: '100vh' }}
+        onClick={() => setPopup({ visible: false, x: 0, y: 0 })}
+      >
+        <ConfirmModal {...confirmModal} />
+        <Popup {...popup} />
         {modal.type === 'CREATE' && modal.isOpen && (
           <UploadFileModal
             isShow={modal.isOpen}
@@ -590,6 +619,9 @@ const Edit = (props) => {
                               key={include.id}
                               icon={<FileTextOutlined />}
                               onClick={() => onAddTabs(include.id)}
+                              onContextMenu={(e) =>
+                                handleRightClickFile(e, include.id)
+                              }
                             >
                               {include.filename}
                             </Menu.Item>
@@ -605,6 +637,9 @@ const Edit = (props) => {
                               key={model.id}
                               icon={<FileTextOutlined />}
                               onClick={() => onAddTabs(model.id)}
+                              onContextMenu={(e) =>
+                                handleRightClickFile(e, model.id)
+                              }
                             >
                               {model.filename}
                             </Menu.Item>
