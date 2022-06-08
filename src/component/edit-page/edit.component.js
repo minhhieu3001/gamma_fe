@@ -377,7 +377,7 @@ const Edit = (props) => {
     formData.append('file', file);
     formData.append('type', data.type);
     formData.append('project_id', data.projectId);
-    formData.append('path', file.name);
+    formData.append('path', data.path + '/' + file.name);
     uploadFile(formData)
       .then((res) => {
         refreshData(user.id);
@@ -487,13 +487,6 @@ const Edit = (props) => {
       >
         <ConfirmModal {...confirmModal} />
         <Popup {...popup} />
-        {modal.type === 'CREATE' && modal.isOpen && (
-          <UploadFileModal
-            isShow={modal.isOpen}
-            onCancel={() => setModal({ type: null, isOpen: false, id: null })}
-            onCreate={handleCreateProject}
-          />
-        )}
         {modal.type === 'UPLOAD_PROJECT' && modal.isOpen && (
           <UploadProjectModal
             isShow={modal.isOpen}

@@ -1,6 +1,5 @@
 import { Col, Form, Input, Modal, Select } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
-import FormItem from 'antd/lib/form/FormItem';
 import { useState } from 'react';
 import { UploadInput } from '../../common/UploadInput';
 import { typeOptions } from '../../constant';
@@ -17,8 +16,8 @@ export const UploadFileModal = (props) => {
   return (
     <Modal
       visible={isShow}
-      title="Create a new project"
-      okText="Create"
+      title="Upload file"
+      okText="Upload"
       onCancel={onCancel}
       onOk={onSubmit}
     >
@@ -59,6 +58,18 @@ export const UploadFileModal = (props) => {
               <Select.Option value={opt.value}>{opt.text}</Select.Option>
             ))}
           </Select>
+        </Form.Item>
+        <Form.Item
+          label="File path"
+          name="path"
+          rules={[
+            {
+              required: true,
+              message: 'You have to input file path!',
+            },
+          ]}
+        >
+          <Input placeholder="Enter file path" />
         </Form.Item>
         <Col span={14} offset={1}>
           <UploadInput
