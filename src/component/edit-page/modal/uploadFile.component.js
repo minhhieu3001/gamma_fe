@@ -59,17 +59,8 @@ export const UploadFileModal = (props) => {
             ))}
           </Select>
         </Form.Item>
-        <Form.Item
-          label="File path"
-          name="path"
-          rules={[
-            {
-              required: true,
-              message: 'You have to input file path!',
-            },
-          ]}
-        >
-          <Input placeholder="Enter file path" />
+        <Form.Item label="Subfolder path" name="path">
+          <Input placeholder="Enter subfolder path" />
         </Form.Item>
         <Col span={14} offset={1}>
           <UploadInput
