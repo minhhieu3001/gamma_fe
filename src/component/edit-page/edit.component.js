@@ -169,7 +169,7 @@ const Edit = (props) => {
               },
             ]);
           } else if (path.path.includes('.csv')) {
-            const rows = content.split('\r\n');
+            const rows = content.split('\n');
             const columns = rows[0].split(',').map((txt) => ({
               title: txt,
               dataIndex: txt.replaceAll(' ', '').toLowerCase(),
@@ -192,6 +192,7 @@ const Edit = (props) => {
               obj.id = i - 1;
               data.push(obj);
             }
+            console.log(columns);
             var edtiableColumns = columns.map((col) => {
               if (!col.editable) {
                 return col;
@@ -616,7 +617,12 @@ const Edit = (props) => {
                                 handleRightClickFile(e, include.id)
                               }
                             >
-                              {include.filename}
+                              <Tooltip
+                                style={{ width: 'auto' }}
+                                title={include.filename}
+                              >
+                                {include.filename}
+                              </Tooltip>
                             </Menu.Item>
                           ))}
                         </SubMenu>
@@ -634,7 +640,12 @@ const Edit = (props) => {
                                 handleRightClickFile(e, model.id)
                               }
                             >
-                              {model.filename}
+                              <Tooltip
+                                style={{ width: 'auto' }}
+                                title={model.filename}
+                              >
+                                {model.filename}
+                              </Tooltip>
                             </Menu.Item>
                           ))}
                         </SubMenu>
