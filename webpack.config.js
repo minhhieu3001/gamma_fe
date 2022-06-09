@@ -57,7 +57,4 @@ module.exports = {
     maxEntrypointSize: 512000,
     maxAssetSize: 512000,
   },
-  resolve: {
-    extensions: ['.js', '.jsx', '.ts', '.tsx'],
-  },
 };
