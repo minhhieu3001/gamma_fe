@@ -49,6 +49,12 @@ const Simulation = (props) => {
   const [jump, setJump] = useState(2);
 
   useEffect(() => {
+    if (counter === 0) {
+      history.push('/edit');
+    }
+  }, [counter]);
+
+  useEffect(() => {
     setLoading(true);
     if (!inputXml || !inputXml.xml || !inputXml.projectName) {
       history.push('/edit');
@@ -104,7 +110,7 @@ const Simulation = (props) => {
 
   useInterval(() => {
     if (first || isLoading) return;
-    if (isFail) setCounter(counter - 1);
+    if (isFail && counter >= 0) setCounter(counter - 1);
     if (step < maxStep && play) {
       setStep(step + 1);
     }

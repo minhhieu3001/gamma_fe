@@ -329,6 +329,7 @@ const Edit = (props) => {
     const outputList = data.outputList.map((item, index) => ({
       ...item,
       id: index,
+      framerate: data.framerate,
     }));
     const pj = projectTree.find((item) =>
       item.models.find((model) => model.id === modal.id),
@@ -348,6 +349,7 @@ const Edit = (props) => {
       );
       if (temp > maxStep) maxStep = temp;
     });
+    console.log(xml);
     setInputXMl({
       model,
       parameterList: data.parameterList || [],

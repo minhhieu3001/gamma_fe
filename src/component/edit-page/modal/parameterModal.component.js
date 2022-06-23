@@ -91,6 +91,22 @@ export const ParameterModal = (props) => {
         >
           <Input placeholder="Enter experiment name" />
         </Form.Item>
+        <Form.Item
+          label="Frame rate"
+          name="framerate"
+          rules={[
+            {
+              required: true,
+              message: 'Frame rate is required!',
+            },
+            {
+              pattern: /^[1-9]\d*$/,
+              message: 'Must be greater than 0',
+            },
+          ]}
+        >
+          <Input type="number" placeholder="Enter number" step={1} />
+        </Form.Item>
         <Descriptions title="Parameters" />
         <div
           className="param-section"
@@ -186,29 +202,6 @@ export const ParameterModal = (props) => {
                         style={{ width: '120px' }}
                       >
                         <Input placeholder="Name" style={{ width: '120px' }} />
-                      </Form.Item>
-                      <Form.Item
-                        {...restField}
-                        name={[name, 'framerate']}
-                        type="number"
-                        rules={[
-                          {
-                            required: true,
-                            message: 'Missing parameter framerate',
-                          },
-                          {
-                            pattern: /^(?:\d*)$/,
-                            message: 'Must be greater than -1',
-                          },
-                        ]}
-                        style={{ width: '120px' }}
-                      >
-                        <Input
-                          placeholder="Frame rate"
-                          type="number"
-                          min={0}
-                          style={{ width: '120px' }}
-                        />
                       </Form.Item>
                       <MinusCircleOutlined onClick={() => remove(name)} />
                     </Space>
