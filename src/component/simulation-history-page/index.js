@@ -18,6 +18,7 @@ import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { downloadSimulation, simulateLastest } from '../../service/api';
 import addNotification, { NOTIFICATION_TYPE } from '../notification';
+import InnerImageZoom from 'react-inner-image-zoom';
 
 const SimulationHistory = (props) => {
   const { id } = props.match.params;
@@ -275,7 +276,14 @@ const SimulationHistory = (props) => {
                         }}
                       >
                         <div className="main-content_1">
-                          <img src={(imageUrl[pane.name] || [])[index]} />
+                          <InnerImageZoom
+                            src={(imageUrl[pane.name] || [])[index]}
+                            width={500}
+                            height={500}
+                            zoomSrc={(imageUrl[pane.name] || [])[index]}
+                            zoomType="drag"
+                            zoomScale={4}
+                          />
                         </div>
                         <div className="step">
                           Step {index + 1} / {maxStep}
