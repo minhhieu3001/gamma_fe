@@ -714,7 +714,7 @@ const Edit = (props) => {
                           }
                           onClick={handleLastestSimulation}
                         >
-                          Lastest Result
+                          Latest Result
                         </Button>
                       )}
                       {pane.isUpdate && (
