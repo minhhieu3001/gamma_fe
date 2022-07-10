@@ -99,8 +99,16 @@ const HeaderComp = (props) => {
         />
       )}
       <Header className="header" style={{ padding: 0, display: 'flex' }}>
-        <Col span={2}>
-          <a href="/edit">
+        <Col span={22}>
+          <a
+            href="/edit"
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              height: '100%',
+            }}
+          >
             <img
               src="https://uet.vnu.edu.vn/wp-content/uploads/2017/02/logo2_new.png"
               alt="gamma-icon"
@@ -108,16 +116,13 @@ const HeaderComp = (props) => {
               height={50}
               style={{ marginLeft: 30 }}
             />
+            <span style={{ color: '#fff', fontSize: 30, marginLeft: 10 }}>
+              ASF HN
+            </span>
           </a>
         </Col>
 
-        <Col span={10}>
-          <a href="/edit">
-            <h1 style={{ color: '#fff' }}>ASF HN</h1>
-          </a>
-        </Col>
-
-        <Col span={12}>
+        <Col span={2}>
           <Dropdown overlay={menu}>
             <Avatar
               size={35}

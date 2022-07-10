@@ -8,6 +8,7 @@ import {
   CloudUploadOutlined,
   DeleteOutlined,
   FileAddOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
 import { isEqual, cloneDeep } from 'lodash';
 import { Tabs, Button } from 'antd';
@@ -533,7 +534,6 @@ const Edit = (props) => {
               <Sider className="site-layout-background" width={200}>
                 <Menu
                   mode="inline"
-                  defaultSelectedKeys={['1']}
                   defaultOpenKeys={['sub1']}
                   className={'scroll-bar'}
                   style={{
@@ -545,57 +545,78 @@ const Edit = (props) => {
                   }}
                 >
                   <Row>
-                    <Col>
-                      <Search
-                        placeholder="input search text"
-                        allowClear
-                        onSearch={onSearch}
-                        style={{ width: 190 }}
-                      />
-                    </Col>
-                    <Col>
-                      <Tooltip title="Upload Project">
+                    <Col span={24}>
+                      <Form
+                        className="search-form"
+                        initialValues={{ keyword: '' }}
+                        onFinish={(data) => {
+                          onSearch(data.keyword || '', activeKey);
+                        }}
+                      >
+                        <Form.Item name="keyword">
+                          <Input
+                            type="text"
+                            placeHolder="Search"
+                            className="search-input"
+                            width={20}
+                          />
+                        </Form.Item>
                         <Button
                           type="text"
+                          title="Search"
+                          htmlType="submit"
                           shape="circle"
-                          icon={<CloudUploadOutlined />}
-                          onClick={() =>
-                            setModal({
-                              type: 'UPLOAD_PROJECT',
-                              isOpen: true,
-                              id: null,
-                            })
-                          }
+                          className="search-button"
+                          icon={<SearchOutlined />}
                         />
-                      </Tooltip>
-                      <Tooltip title="Upload File">
-                        <Button
-                          type="text"
-                          shape="circle"
-                          icon={<FileAddOutlined />}
-                          onClick={() =>
-                            setModal({
-                              type: 'UPLOAD_FILE',
-                              isOpen: true,
-                              id: null,
-                            })
-                          }
-                        />
-                      </Tooltip>
-                      <Tooltip title="Delete">
-                        <Button
-                          type="text"
-                          shape="circle"
-                          icon={<DeleteOutlined />}
-                          onClick={() =>
-                            setModal({
-                              type: 'DELETE',
-                              isOpen: true,
-                              id: null,
-                            })
-                          }
-                        />
-                      </Tooltip>
+                        <div className="search-option">
+                          <Tooltip title="Upload Project">
+                            <Button
+                              className="search-button_child"
+                              type="text"
+                              shape="circle"
+                              icon={<CloudUploadOutlined />}
+                              onClick={() =>
+                                setModal({
+                                  type: 'UPLOAD_PROJECT',
+                                  isOpen: true,
+                                  id: null,
+                                })
+                              }
+                            />
+                          </Tooltip>
+                          <Tooltip title="Upload File">
+                            <Button
+                              className="search-button_child"
+                              type="text"
+                              shape="circle"
+                              icon={<FileAddOutlined />}
+                              onClick={() =>
+                                setModal({
+                                  type: 'UPLOAD_FILE',
+                                  isOpen: true,
+                                  id: null,
+                                })
+                              }
+                            />
+                          </Tooltip>
+                          <Tooltip title="Delete">
+                            <Button
+                              type="text"
+                              className="search-button_child"
+                              shape="circle"
+                              icon={<DeleteOutlined />}
+                              onClick={() =>
+                                setModal({
+                                  type: 'DELETE',
+                                  isOpen: true,
+                                  id: null,
+                                })
+                              }
+                            />
+                          </Tooltip>
+                        </div>
+                      </Form>
                     </Col>
                   </Row>
                   {projectTree.map((item, index) => {

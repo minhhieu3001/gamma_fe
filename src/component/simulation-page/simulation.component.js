@@ -5,30 +5,19 @@ import {
   ForwardOutlined,
   PauseOutlined,
   RedoOutlined,
-  UserOutlined,
 } from '@ant-design/icons';
-import {
-  Avatar,
-  Button,
-  Col,
-  Dropdown,
-  Input,
-  Layout,
-  Modal,
-  Spin,
-  Tabs,
-} from 'antd';
-import { Content, Header } from 'antd/lib/layout/layout';
+import { Button, Input, Layout, Modal, Tabs, Tooltip } from 'antd';
+import { Content } from 'antd/lib/layout/layout';
 import HeaderComp from '../common/header.component';
 import './style.scss';
-import { useEffect, useState } from 'react';
-import { DEFAULT_COUNTER, imageUrls } from '../constant';
+import { Fragment, useEffect, useState } from 'react';
+import { DEFAULT_COUNTER } from '../constant';
 import { getItem, useInterval } from '../../utils';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { downloadSimulation, simulate } from '../../service/api';
 import addNotification, { NOTIFICATION_TYPE } from '../notification';
-import { useParams } from 'react-router-dom';
+import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 
 const Simulation = (props) => {
   const { id } = props.match.params;
@@ -153,8 +142,8 @@ const Simulation = (props) => {
   return (
     <>
       <Modal
-        visible={modal.isOpen && modal.type === 'Jump'}
-        title="Jump step"
+        visible={modal.isOpen && modal.type === 'Forward'}
+        title="Forward step"
         okText="Submit"
         style={{ top: 100 }}
         onCancel={() => setModal({ isOpen: false, type: '' })}
@@ -229,42 +218,45 @@ const Simulation = (props) => {
                   >
                     Step: {step}{' '}
                   </span>
-                  <Button
-                    shape="circle"
-                    icon={play ? <PauseOutlined /> : <CaretRightOutlined />}
-                    onClick={() => setPlay(!play)}
-                    style={{ marginRight: 5, marginLeft: 5 }}
-                  />
-                  <Button
-                    shape="circle"
-                    icon={<ForwardOutlined />}
-                    onClick={() => {
-                      setModal({ isOpen: true, type: 'Jump' });
-                    }}
-                    style={{ marginRight: 5 }}
-                  />
-                  <Button
-                    shape="circle"
-                    icon={<RedoOutlined />}
-                    style={{ marginRight: 5 }}
-                    onClick={() => {
-                      setPlay(false);
-                      setTimeout(() => setStep(1), 0);
-                    }}
-                  />
-                  <Button
-                    shape="circle"
-                    icon={<DownloadOutlined />}
-                    style={{ marginRight: 5 }}
-                    onClick={() => setModal({ isOpen: true, type: 'Download' })}
-                  />
-                  <Button
-                    shape="circle"
-                    icon={<FormOutlined />}
-                    onClick={() => {
-                      history.push('/edit');
-                    }}
-                  />
+                  <Tooltip placement="top" title="Play/Pause">
+                    <Button
+                      shape="circle"
+                      icon={play ? <PauseOutlined /> : <CaretRightOutlined />}
+                      onClick={() => setPlay(!play)}
+                      style={{ marginRight: 5, marginLeft: 5 }}
+                    />
+                  </Tooltip>
+                  <Tooltip placement="top" title="Forward">
+                    <Button
+                      shape="circle"
+                      icon={<ForwardOutlined />}
+                      onClick={() => {
+                        setModal({ isOpen: true, type: 'Forward' });
+                      }}
+                      style={{ marginRight: 5 }}
+                    />
+                  </Tooltip>
+                  <Tooltip placement="top" title="Reset">
+                    <Button
+                      shape="circle"
+                      icon={<RedoOutlined />}
+                      style={{ marginRight: 5 }}
+                      onClick={() => {
+                        setPlay(false);
+                        setTimeout(() => setStep(1), 0);
+                      }}
+                    />
+                  </Tooltip>
+                  <Tooltip placement="top" title="Download">
+                    <Button
+                      shape="circle"
+                      icon={<DownloadOutlined />}
+                      style={{ marginRight: 5 }}
+                      onClick={() =>
+                        setModal({ isOpen: true, type: 'Download' })
+                      }
+                    />
+                  </Tooltip>
                 </div>
               )}
               <Tabs
@@ -293,7 +285,72 @@ const Simulation = (props) => {
                         }}
                       >
                         <div className="main-content_1">
-                          <img src={(imageUrl[pane.name] || [])[index]} />
+                          <TransformWrapper
+                            initialScale={1}
+                            doubleClick={{
+                              step: 1,
+                            }}
+                          >
+                            {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
+                              <Fragment>
+                                <TransformComponent>
+                                  <img
+                                    src={(imageUrl[pane.name] || [])[index]}
+                                    alt="test"
+                                    width={500}
+                                    height={500}
+                                  />
+                                </TransformComponent>
+                                <div className="tools">
+                                  <div className="button-comp">
+                                    <Tooltip placement="right" title="Zoom In">
+                                      <button
+                                        className="zoom-btn"
+                                        onClick={() => zoomIn()}
+                                      >
+                                        <img
+                                          src="/image/plus.png"
+                                          width={13}
+                                          height={13}
+                                        />
+                                      </button>
+                                    </Tooltip>
+                                  </div>
+                                  <div className="button-comp">
+                                    <Tooltip placement="right" title="Zoom Out">
+                                      <button
+                                        className="zoom-btn"
+                                        onClick={() => zoomOut()}
+                                      >
+                                        <img
+                                          src="/image/minus.png"
+                                          width={13}
+                                          height={13}
+                                        />
+                                      </button>
+                                    </Tooltip>
+                                  </div>
+                                  <div className="button-comp">
+                                    <Tooltip
+                                      placement="right"
+                                      title="Reset Zoom"
+                                    >
+                                      <button
+                                        className="zoom-btn"
+                                        onClick={() => resetTransform()}
+                                      >
+                                        <img
+                                          src="/image/target.png"
+                                          width={15}
+                                          height={15}
+                                        />
+                                      </button>
+                                    </Tooltip>
+                                  </div>
+                                </div>
+                              </Fragment>
+                            )}
+                          </TransformWrapper>
                           <div className="step">
                             Step {index + 1} / {maxStep}
                           </div>

@@ -93,14 +93,6 @@ export const LogIn = () => {
                 />
               </Form.Item>
 
-              <Form.Item
-                name="remember"
-                valuePropName="checked"
-                wrapperCol={{ span: 16 }}
-              >
-                <Checkbox>Remember me</Checkbox>
-              </Form.Item>
-
               <Form.Item wrapperCol={{ span: 24 }}>
                 <Button
                   style={{ width: '100%', borderRadius: '10px' }}
