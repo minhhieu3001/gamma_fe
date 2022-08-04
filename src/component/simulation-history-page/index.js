@@ -181,6 +181,30 @@ const SimulationHistory = (props) => {
           }}
         />
       </Modal>
+      <Modal
+        visible={modal.isOpen && modal.type === 'Forward'}
+        title="Forward step"
+        okText="Submit"
+        style={{ top: 100 }}
+        onCancel={() => setModal({ isOpen: false, type: '' })}
+        onOk={onJumpSubmit}
+        width={200}
+      >
+        <Input
+          type="number"
+          max={maxStep}
+          value={jump.step}
+          min={1}
+          step={1}
+          onChange={(e) => {
+            //remove . and -
+            [45, 46].includes(e.charCode) && e.preventDefault();
+            setJump(
+              parseInt(e.target.value > maxStep ? maxStep : e.target.value),
+            );
+          }}
+        />
+      </Modal>
       <Layout style={{ height: '100vh' }}>
         <HeaderComp></HeaderComp>
         <Content style={{ padding: '0 0px' }}>
@@ -224,6 +248,7 @@ const SimulationHistory = (props) => {
                       icon={<ForwardOutlined />}
                       onClick={() => {
                         setModal({ isOpen: true, type: 'Forward' });
+                        console.log(modal)
                       }}
                       style={{ marginRight: 5 }}
                     />
