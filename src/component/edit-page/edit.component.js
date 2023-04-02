@@ -293,6 +293,7 @@ const Edit = (props) => {
     var formData = new FormData();
     formData.append('user_id', user.id);
     formData.append('payload', file);
+    console.log(file);
     upload(formData)
       .then((response) => {
         list({ user_id: user.id })

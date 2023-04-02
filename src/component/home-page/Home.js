@@ -4,16 +4,20 @@ import {
   HomeOutlined,
   EditOutlined,
   WechatOutlined,
+  BarChartOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, theme } from 'antd';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import EditComponent from '../edit-page/edit.component';
+import Edit from '../edit-page/edit.component';
 import './style.scss';
+import { useHistory } from 'react-router-dom';
 
 const { Header, Sider, Content } = Layout;
 
 const Home = () => {
+  const history = useHistory();
   const [collapsed, setCollapsed] = useState(false);
   const [choose, setChoose] = useState(1);
 
@@ -23,7 +27,13 @@ const Home = () => {
 
   return (
     <Layout>
-      <Sider trigger={null} collapsible collapsed={collapsed}>
+      <Sider
+        breakpoint="lg"
+        collapsedWidth="0"
+        trigger={null}
+        collapsible
+        collapsed={collapsed}
+      >
         <div className="logo" />
         <Menu
           theme="dark"
@@ -41,8 +51,7 @@ const Home = () => {
               icon: <EditOutlined />,
               label: 'Edit',
               onClick: () => {
-                // setChoose(2);
-                setCollapsed(!collapsed);
+                history.push('/edit');
               },
             },
             {
@@ -50,6 +59,16 @@ const Home = () => {
               icon: <WechatOutlined />,
               label: 'Chat',
               onClick: () => setChoose(3),
+            },
+            {
+              key: '4',
+              icon: <BarChartOutlined />,
+              label: 'Chart',
+            },
+            {
+              key: '5',
+              icon: <UserOutlined />,
+              label: 'Member',
             },
           ]}
         />
@@ -75,9 +94,7 @@ const Home = () => {
             padding: 24,
             minHeight: 280,
           }}
-        >
-          {choose === 1 ? <></> : choose == 2 ? <EditComponent /> : <></>}
-        </Content>
+        ></Content>
       </Layout>
     </Layout>
   );
