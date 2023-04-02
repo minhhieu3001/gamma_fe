@@ -10,9 +10,10 @@ import {
 import { Layout, Menu, theme } from 'antd';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import Edit from '../edit-page/edit.component';
 import './style.scss';
 import { useHistory } from 'react-router-dom';
+import SimulateHome from '../common/SimulateHome';
+import HeaderComponent from '../common/header.component';
 
 const { Header, Sider, Content } = Layout;
 
@@ -50,25 +51,28 @@ const Home = () => {
               key: '2',
               icon: <EditOutlined />,
               label: 'Edit',
-              onClick: () => {
-                history.push('/edit');
-              },
+              onClick: () => setChoose(2),
             },
             {
               key: '3',
               icon: <WechatOutlined />,
               label: 'Chat',
-              onClick: () => setChoose(3),
+              onClick: () => {
+                setChoose(3);
+                history.push('/chat');
+              },
             },
             {
               key: '4',
               icon: <BarChartOutlined />,
               label: 'Chart',
+              onClick: () => setChoose(4),
             },
             {
               key: '5',
               icon: <UserOutlined />,
               label: 'Member',
+              onClick: () => setChoose(5),
             },
           ]}
         />
@@ -94,7 +98,19 @@ const Home = () => {
             padding: 24,
             minHeight: 280,
           }}
-        ></Content>
+        >
+          {choose === 1 ? (
+            <></>
+          ) : choose === 2 ? (
+            <SimulateHome />
+          ) : choose === 3 ? (
+            <></>
+          ) : choose === 4 ? (
+            <></>
+          ) : (
+            <></>
+          )}
+        </Content>
       </Layout>
     </Layout>
   );

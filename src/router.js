@@ -1,5 +1,6 @@
 import { LogIn } from './component/auth/log-in.component';
 import { Register } from './component/auth/register.component';
+import Chat from './component/Chat-Page';
 import Edit from './component/edit-page/edit.component';
 import Home from './component/home-page/Home';
 import Introduction from './component/introduction-page';
@@ -41,5 +42,10 @@ export const router = [
     name: 'simulation',
     path: '/simulation/:id/history',
     component: SimulationHistoryPage,
+  },
+  {
+    name: 'chat',
+    path: '/chat',
+    component: Chat,
   },
 ];
