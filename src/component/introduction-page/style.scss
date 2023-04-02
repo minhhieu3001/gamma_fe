@@ -1,0 +1,59 @@
+.root {
+    width: 100vw;
+}
+
+.top {
+    height: 10vh;
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.test {
+    font-size: 2.5em;
+    font-weight: 500;
+}
+
+.content {
+    position:relative;
+    width: 100%;
+}
+
+.image {
+    width: 500px;
+}
+
+.overlay {
+    position: absolute;
+        
+        top: 40%;        
+        left: 20%;        
+        width: 60%;        
+        height: 100%;
+        justify-content: center;       
+        align-items: center;        
+        font-size: 2rem;
+        text-align: center;
+       
+}
+
+#name {
+    color: white;
+}
+.introWeb {
+    margin-top: 100px   ;
+    justify-content: center;
+}
+
+#nameWeb {
+    text-align: center;
+    font-size: 45px;
+    font-weight: 600;
+}
+
+#webContent {
+    text-align: center;
+    font-size: 30px;
+    width: 80vw;
+}

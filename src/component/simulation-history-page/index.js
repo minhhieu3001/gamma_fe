@@ -44,7 +44,7 @@ const SimulationHistory = (props) => {
 
   useEffect(() => {
     const user = getItem('user');
-    if (!user) history.push('/');
+    if (!user) history.push('/login');
     setLoading(true);
     var max = 0;
     simulateLastest(id)
@@ -248,7 +248,7 @@ const SimulationHistory = (props) => {
                       icon={<ForwardOutlined />}
                       onClick={() => {
                         setModal({ isOpen: true, type: 'Forward' });
-                        console.log(modal)
+                        console.log(modal);
                       }}
                       style={{ marginRight: 5 }}
                     />

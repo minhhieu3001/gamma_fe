@@ -33,7 +33,7 @@ const HeaderComp = (props) => {
   const history = useHistory();
   const logout = () => {
     localStorage.clear();
-    history.push('/');
+    history.push('/login');
   };
   const [modal, setModal] = useState({
     isOpen: false,

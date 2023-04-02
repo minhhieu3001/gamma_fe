@@ -107,7 +107,7 @@ const Edit = (props) => {
   useEffect(() => {
     localStorage.removeItem('tabs');
     const tempUser = getItem('user');
-    if (!tempUser) history.push('/');
+    if (!tempUser) history.push('/login');
     setUser(tempUser);
     refreshData(tempUser.id);
   }, []);

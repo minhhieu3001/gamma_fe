@@ -24,7 +24,7 @@ export const Register = () => {
           'Create account successfully',
           NOTIFICATION_TYPE.SUCCESS,
         );
-        history.push('/');
+        history.push('/login');
       })
       .catch((err) => {
         if (err.response)
@@ -136,7 +136,7 @@ export const Register = () => {
 
               <Form.Item wrapperCol={{ span: 24 }}>
                 Already have account?
-                <Button type="link" href="/">
+                <Button type="link" href="/login">
                   Log in here
                 </Button>
               </Form.Item>

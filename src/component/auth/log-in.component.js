@@ -18,19 +18,20 @@ export const LogIn = () => {
   const history = useHistory();
   const onFinish = (values) => {
     setLoading(true);
-    login(values)
-      .then((res) => {
-        const data = res.data;
-        localStorage.setItem('token', data.token);
-        setItem('user', data.user);
-        history.push('/edit');
-      })
-      .catch(function (err) {
-        if (err.response)
-          addNotification(err.response.data.message, NOTIFICATION_TYPE.ERROR);
-        else addNotification(err, NOTIFICATION_TYPE.ERROR);
-      })
-      .finally(() => setLoading(false));
+    history.push('/home');
+    // login(values)
+    //   .then((res) => {
+    //     const data = res.data;
+    //     localStorage.setItem('token', data.token);
+    //     localStorage.setItem('introduce', true);
+    //     setItem('user', data.user);
+    //   })
+    //   .catch(function (err) {
+    //     if (err.response)
+    //       addNotification(err.response.data.message, NOTIFICATION_TYPE.ERROR);
+    //     else addNotification(err, NOTIFICATION_TYPE.ERROR);
+    //   })
+    //   .finally(() => setLoading(false));
   };
   return (
     <>
