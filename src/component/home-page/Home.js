@@ -19,6 +19,8 @@ import HomeContent from './home.content';
 import ChartComponent from './chart.component';
 import AccountComponent from './account.component';
 import { getItem } from '../../utils';
+import Edit from '../edit-page/edit.component';
+import { set } from 'lodash';
 
 const { Header, Sider, Content } = Layout;
 
@@ -27,11 +29,11 @@ const Home = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [choose, setChoose] = useState(1);
 
-  useEffect(() => {
-    localStorage.removeItem('tabs');
-    const tempUser = getItem('user');
-    if (!tempUser) history.push('/login');
-  });
+  // useEffect(() => {
+  //   localStorage.removeItem('tabs');
+  //   const tempUser = getItem('user');
+  //   if (!tempUser) history.push('/login');
+  // });
 
   return (
     <Layout style={{ height: '100vh' }}>
@@ -65,7 +67,6 @@ const Home = () => {
               icon: <WechatOutlined />,
               label: 'Chat',
               onClick: () => {
-                setChoose(3);
                 history.push('/chat');
               },
             },
@@ -121,9 +122,9 @@ const Home = () => {
           {choose === 1 ? (
             <HomeContent />
           ) : choose === 2 ? (
-            <SimulateHome />
+            <SimulateHome setChoose={setChoose} />
           ) : choose === 3 ? (
-            <></>
+            <Edit />
           ) : choose === 4 ? (
             <ChartComponent />
           ) : (
