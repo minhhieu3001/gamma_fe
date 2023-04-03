@@ -6,6 +6,7 @@ import {
   WechatOutlined,
   BarChartOutlined,
   UserOutlined,
+  LogoutOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu, theme } from 'antd';
 import React, { useState } from 'react';
@@ -14,6 +15,10 @@ import './style.scss';
 import { useHistory } from 'react-router-dom';
 import SimulateHome from '../common/SimulateHome';
 import HeaderComponent from '../common/header.component';
+import HomeContent from './home.content';
+import ChartComponent from './chart.component';
+import AccountComponent from './account.component';
+import { getItem } from '../../utils';
 
 const { Header, Sider, Content } = Layout;
 
@@ -23,19 +28,21 @@ const Home = () => {
   const [choose, setChoose] = useState(1);
 
   useEffect(() => {
-    console.log(choose);
+    localStorage.removeItem('tabs');
+    const tempUser = getItem('user');
+    if (!tempUser) history.push('/login');
   });
 
   return (
-    <Layout>
+    <Layout style={{ height: '100vh' }}>
       <Sider
         breakpoint="lg"
         collapsedWidth="0"
         trigger={null}
         collapsible
         collapsed={collapsed}
+        style={{ height: '100%' }}
       >
-        <div className="logo" />
         <Menu
           theme="dark"
           mode="inline"
@@ -50,7 +57,7 @@ const Home = () => {
             {
               key: '2',
               icon: <EditOutlined />,
-              label: 'Edit',
+              label: 'Simulate',
               onClick: () => setChoose(2),
             },
             {
@@ -82,33 +89,45 @@ const Home = () => {
           style={{
             paddingLeft: 20,
             backgroundColor: 'white',
+            display: 'flex',
+            justifyContent: 'space-between',
           }}
         >
           {React.createElement(
             collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
+
             {
               className: 'trigger',
               onClick: () => setCollapsed(!collapsed),
+              style: { fontSize: 30, alignSelf: 'center' },
             },
           )}
+          <LogoutOutlined
+            style={{ fontSize: 30, alignSelf: 'center' }}
+            onClick={() => {
+              localStorage.clear();
+              history.push('/login');
+            }}
+          />
         </Header>
         <Content
           style={{
-            margin: '24px 16px',
-            padding: 24,
-            minHeight: 280,
+            height: '100%',
+            padding: 20,
+            overflow: 'scroll',
+            backgroundColor: 'white',
           }}
         >
           {choose === 1 ? (
-            <></>
+            <HomeContent />
           ) : choose === 2 ? (
             <SimulateHome />
           ) : choose === 3 ? (
             <></>
           ) : choose === 4 ? (
-            <></>
+            <ChartComponent />
           ) : (
-            <></>
+            <AccountComponent />
           )}
         </Content>
       </Layout>
